@@ -3,96 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pet Visit Scheduler</title>
+  <title>Select Dates</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', sans-serif;
+      background: #f9f9f9;
       margin: 0;
       padding: 20px;
-      background-color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
     }
     h1 {
-      margin-bottom: 20px;
+      font-size: 1.5em;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      max-width: 700px;
+      margin: 20px 0;
     }
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    input[type="date"], select, button {
-      width: 100%;
+    .day {
       padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
     }
-    select[multiple] {
-      height: 200px;
+    .day.selected {
+      background: #cce5ff;
+      border-color: #3399ff;
     }
     button {
-      background-color: #4CAF50;
-      color: white;
+      padding: 10px 20px;
+      font-size: 1em;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #45a049;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Schedule Drop-In Pet Visits</h1>
-    <label for="dates">Select Dates:</label>
-    <input type="date" id="dates" multiple />
-
-    <label for="times">Select Time Blocks:</label>
-    <select id="times" multiple>
-      <!-- Time blocks from 7:30am to 8:00pm in 30-minute increments -->
-    </select>
-
-    <button onclick="submitSchedule()">Send Schedule Request</button>
-  </div>
+  <h1>Select Drop-In Visit Dates</h1>
+  <div class="calendar" id="calendar"></div>
+  <button onclick="goToTimePage()">Next: Select Times</button>
 
   <script>
-    // Generate 30-minute time blocks from 7:30am to 8:00pm
-    const timeSelect = document.getElementById('times');
-    const start = 7 * 60 + 30; // 7:30 AM in minutes
-    const end = 20 * 60; // 8:00 PM in minutes
-    for (let mins = start; mins <= end; mins += 30) {
-      const h = Math.floor(mins / 60);
-      const m = mins % 60;
-      const label = `${(h % 12 || 12)}:${m.toString().padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
-      const option = document.createElement('option');
-      option.value = label;
-      option.textContent = label;
-      timeSelect.appendChild(option);
+    const calendar = document.getElementById('calendar');
+    const today = new Date();
+    const selectedDates = [];
+
+    for (let i = 0; i < 30; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      const dateStr = date.toISOString().split('T')[0];
+
+      const div = document.createElement('div');
+      div.className = 'day';
+      div.textContent = date.toDateString();
+      div.dataset.date = dateStr;
+
+      div.addEventListener('click', () => {
+        div.classList.toggle('selected');
+        const index = selectedDates.indexOf(dateStr);
+        if (index > -1) {
+          selectedDates.splice(index, 1);
+        } else {
+          selectedDates.push(dateStr);
+        }
+      });
+      calendar.appendChild(div);
     }
 
-    function submitSchedule() {
-      const dateInput = document.getElementById('dates');
-      const timeInput = document.getElementById('times');
-      const times = Array.from(timeInput.selectedOptions).map(opt => opt.value);
-
-      const date = dateInput.value;
-      if (!date || times.length === 0) {
-        alert('Please select a date and one or more time blocks.');
-        return;
-      }
-
-      const subject = encodeURIComponent('Pet Visit Reservation');
-      const body = encodeURIComponent(`I'd like to schedule pet visits on ${date} during the following times:\n\n${times.join(', ')}`);
-      window.location.href = `mailto:catdoggoose01@gmail.com?subject=${subject}&body=${body}`;
+    function goToTimePage() {
+      const dates = encodeURIComponent(JSON.stringify(selectedDates));
+      window.location.href = `time.html?dates=${dates}`;
     }
   </script>
 </body>
