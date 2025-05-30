@@ -3,65 +3,65 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Select Booking Dates 2025</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+<title>2025 Year Calendar Multi-Select</title>
 <style>
   body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    padding: 20px;
     margin: 0;
-    font-family: 'Inter', sans-serif;
-    background-color: #f9f9f9;
     color: #333;
-    padding: 2rem;
   }
   h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
     text-align: center;
   }
   .year-calendar {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
+    gap: 20px;
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 20px auto;
   }
-  .month-container {
+  .month {
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 10px;
   }
   .month-name {
     text-align: center;
-    font-weight: 700;
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
   }
   .weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    font-weight: 600;
+    font-weight: bold;
+    font-size: 0.8rem;
     color: #666;
-    margin-bottom: 0.25rem;
+    margin-bottom: 4px;
     user-select: none;
   }
   .weekdays div {
     text-align: center;
-    font-size: 0.75rem;
-    padding: 0.2rem 0;
   }
-  .days-grid {
+  .days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 0.2rem;
+    gap: 4px;
   }
   .day {
-    padding: 0.4rem 0;
     text-align: center;
+    padding: 6px 0;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 6px;
     user-select: none;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+  }
+  .day:hover:not(.disabled):not(.selected) {
+    background-color: #d0eaff;
   }
   .day.disabled {
     color: #bbb;
@@ -70,30 +70,109 @@
   .day.selected {
     background-color: #007aff;
     color: white;
-    font-weight: 700;
+    font-weight: bold;
+    border-color: #005fcc;
   }
 </style>
 </head>
 <body>
 
-<h1>Select One or More Booking Dates in 2025</h1>
+<h1>Select Booking Dates for 2025</h1>
 
-<div class="year-calendar" id="year-calendar"></div>
+<div class="year-calendar" id="yearCalendar"></div>
 
 <script>
-  const yearCalendar = document.getElementById('year-calendar');
-  const YEAR = 2025;
+  const year = 2025;
+  const yearCalendar = document.getElementById('yearCalendar');
   let selectedDates = JSON.parse(localStorage.getItem('selectedDates')) || [];
 
   function formatDate(date) {
     return date.toISOString().split('T')[0];
   }
 
-  function createMonthCalendar(year, month) {
-    const monthContainer = document.createElement('div');
-    monthContainer.className = 'month-container';
+  function createMonth(monthIndex) {
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
 
-    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const monthNameDiv = document.createElement('div');
-    monthNameDiv.className = 'month-name';
-    monthNameDiv.textContent = monthN
+    const monthDiv = document.createElement('div');
+    monthDiv.className = 'month';
+
+    // Month title
+    const title = document.createElement('div');
+    title.className = 'month-name';
+    title.textContent = monthNames[monthIndex];
+    monthDiv.appendChild(title);
+
+    // Weekday headers
+    const weekdays = document.createElement('div');
+    weekdays.className = 'weekdays';
+    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(d => {
+      const wd = document.createElement('div');
+      wd.textContent = d;
+      weekdays.appendChild(wd);
+    });
+    monthDiv.appendChild(weekdays);
+
+    // Days grid
+    const daysGrid = document.createElement('div');
+    daysGrid.className = 'days';
+
+    const firstDay = new Date(year, monthIndex, 1);
+    const lastDay = new Date(year, monthIndex + 1, 0);
+    const daysInMonth = lastDay.getDate();
+
+    // Blank days before first day of month (to align weekdays)
+    const startingDay = firstDay.getDay();
+    for (let i = 0; i < startingDay; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'day disabled';
+      daysGrid.appendChild(emptyCell);
+    }
+
+    // Add actual days
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateObj = new Date(year, monthIndex, day);
+      const dateStr = formatDate(dateObj);
+      const dayDiv = document.createElement('div');
+      dayDiv.className = 'day';
+      dayDiv.textContent = day;
+      dayDiv.dataset.date = dateStr;
+
+      // Disable past dates (if before today)
+      if (dateObj < today) {
+        dayDiv.classList.add('disabled');
+      } else {
+        if (selectedDates.includes(dateStr)) {
+          dayDiv.classList.add('selected');
+        }
+        dayDiv.addEventListener('click', () => {
+          if (dayDiv.classList.contains('selected')) {
+            dayDiv.classList.remove('selected');
+            selectedDates = selectedDates.filter(d => d !== dateStr);
+          } else {
+            selectedDates.push(dateStr);
+            dayDiv.classList.add('selected');
+          }
+          localStorage.setItem('selectedDates', JSON.stringify(selectedDates));
+        });
+      }
+      daysGrid.appendChild(dayDiv);
+    }
+
+    monthDiv.appendChild(daysGrid);
+    return monthDiv;
+  }
+
+  // Render all 12 months
+  for (let m = 0; m < 12; m++) {
+    yearCalendar.appendChild(createMonth(m));
+  }
+</script>
+
+</body>
+</html>
