@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Select Booking Dates</title>
+<title>Select Booking Dates 2025</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 <style>
   body {
@@ -11,69 +11,57 @@
     font-family: 'Inter', sans-serif;
     background-color: #f9f9f9;
     color: #333;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     padding: 2rem;
   }
   h1 {
     font-size: 2rem;
     margin-bottom: 1rem;
+    text-align: center;
   }
-  .calendar-container {
-    max-width: 400px;
-    width: 100%;
+  .year-calendar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .month-container {
     background: white;
     border-radius: 12px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     padding: 1rem;
   }
-  .calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  .calendar-header button {
-    background: #007aff;
-    border: none;
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
-    padding: 0.3rem 0.8rem;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  .calendar-header button:hover {
-    background: #005fcc;
-  }
-  .month-year {
-    font-size: 1.25rem;
+  .month-name {
+    text-align: center;
     font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
   }
   .weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     font-weight: 600;
     color: #666;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     user-select: none;
   }
   .weekdays div {
     text-align: center;
-    padding: 0.25rem 0;
+    font-size: 0.75rem;
+    padding: 0.2rem 0;
   }
   .days-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 0.3rem;
+    gap: 0.2rem;
   }
   .day {
-    padding: 0.5rem 0;
+    padding: 0.4rem 0;
     text-align: center;
     cursor: pointer;
     border-radius: 8px;
     user-select: none;
+    font-size: 0.85rem;
   }
   .day.disabled {
     color: #bbb;
@@ -84,121 +72,28 @@
     color: white;
     font-weight: 700;
   }
-  .next-button {
-    margin-top: 1.5rem;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    background-color: #007aff;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .next-button:hover {
-    background-color: #005fcc;
-  }
 </style>
 </head>
 <body>
 
-<h1>Select One or More Booking Dates</h1>
+<h1>Select One or More Booking Dates in 2025</h1>
 
-<div class="calendar-container">
-  <div class="calendar-header">
-    <button id="prev-month" aria-label="Previous month">&lt;</button>
-    <div class="month-year" id="month-year"></div>
-    <button id="next-month" aria-label="Next month">&gt;</button>
-  </div>
-  <div class="weekdays">
-    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-  </div>
-  <div class="days-grid" id="days-grid"></div>
-</div>
-
-<a href="time.html" class="next-button" id="next-button">Next: Select Time Blocks</a>
+<div class="year-calendar" id="year-calendar"></div>
 
 <script>
-  const daysGrid = document.getElementById('days-grid');
-  const monthYearLabel = document.getElementById('month-year');
-  const prevBtn = document.getElementById('prev-month');
-  const nextBtn = document.getElementById('next-month');
-
+  const yearCalendar = document.getElementById('year-calendar');
+  const YEAR = 2025;
   let selectedDates = JSON.parse(localStorage.getItem('selectedDates')) || [];
-  let currentDate = new Date();
 
   function formatDate(date) {
     return date.toISOString().split('T')[0];
   }
 
-  function renderCalendar(date) {
-    daysGrid.innerHTML = '';
-    const year = date.getFullYear();
-    const month = date.getMonth();
+  function createMonthCalendar(year, month) {
+    const monthContainer = document.createElement('div');
+    monthContainer.className = 'month-container';
 
-    // Set month-year header
     const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    monthYearLabel.textContent = `${monthNames[month]} ${year}`;
-
-    // First day of month and total days
-    const firstDayOfMonth = new Date(year, month, 1);
-    const startingDay = firstDayOfMonth.getDay(); // 0=Sun,1=Mon...
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    // Fill leading empty cells for first week
-    for (let i = 0; i < startingDay; i++) {
-      const emptyCell = document.createElement('div');
-      emptyCell.className = 'day disabled';
-      daysGrid.appendChild(emptyCell);
-    }
-
-    // Create day cells
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dayCell = document.createElement('div');
-      dayCell.className = 'day';
-      dayCell.textContent = day;
-      const fullDate = new Date(year, month, day);
-      const fullDateString = formatDate(fullDate);
-      dayCell.dataset.date = fullDateString;
-
-      // Disable past days
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      if(fullDate < today){
-        dayCell.classList.add('disabled');
-      } else {
-        // Highlight if selected
-        if (selectedDates.includes(fullDateString)) {
-          dayCell.classList.add('selected');
-        }
-        dayCell.addEventListener('click', () => {
-          if(dayCell.classList.contains('selected')){
-            dayCell.classList.remove('selected');
-            selectedDates = selectedDates.filter(d => d !== fullDateString);
-          } else {
-            selectedDates.push(fullDateString);
-            dayCell.classList.add('selected');
-          }
-          localStorage.setItem('selectedDates', JSON.stringify(selectedDates));
-        });
-      }
-      daysGrid.appendChild(dayCell);
-    }
-  }
-
-  prevBtn.addEventListener('click', () => {
-    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
-    renderCalendar(currentDate);
-  });
-
-  nextBtn.addEventListener('click', () => {
-    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-    renderCalendar(currentDate);
-  });
-
-  renderCalendar(currentDate);
-</script>
-
-</body>
-</html>
+    const monthNameDiv = document.createElement('div');
+    monthNameDiv.className = 'month-name';
+    monthNameDiv.textContent = monthN
