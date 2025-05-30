@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Select Days</title>
+  <title>Select Days and Time</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -54,6 +54,27 @@
       border-color: #007aff;
     }
 
+    .time-blocks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      max-width: 500px;
+    }
+
+    .time-block {
+      padding: 0.5rem 1rem;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+
+    .time-block.selected {
+      background-color: #007aff;
+      color: white;
+    }
+
     .next-button {
       padding: 0.75rem 1.5rem;
       font-size: 1rem;
@@ -71,25 +92,37 @@
   </style>
 </head>
 <body>
-  <h1>Select One or More Days</h1>
+  <h1>Select Days and Time Blocks</h1>
   <div class="calendar-controls">
-    <button onclick="changeMonth(-1)">&lt; Prev</button>
+    <button onclick="changeMonth(-1)" type="button">&lt; Prev</button>
     <span id="monthLabel"></span>
-    <button onclick="changeMonth(1)">Next &gt;</button>
+    <button onclick="changeMonth(1)" type="button">Next &gt;</button>
   </div>
   <div class="calendar" id="calendar"></div>
 
+  <div class="time-blocks" id="timeBlocks"></div>
+
   <form id="bookingForm" method="POST" target="_blank">
-    <input type="hidden" name="entry.2080923976" value="Wesley and Olaf, dogs, feed twice a day, 1 cup each time, friendly loves to bark">
+    <label>Name: <input name="entry.1000000001" required></label><br><br>
+    <label>Email: <input type="email" name="entry.1000000002" required></label><br><br>
+    <label>Phone Number: <input name="entry.1000000004" required></label><br><br>
+    <label>Address: <input name="entry.1000000003" required></label><br><br>
+    <label>Tell me about your pets:<br>
+      <textarea name="entry.2080923976" rows="4" cols="50" required placeholder="Name, cat/dog/chicken/goose, daily routine, behavior..."></textarea>
+    </label><br><br>
     <input type="hidden" id="selectedDatesField" name="entry.1234567890">
+    <input type="hidden" id="selectedTimesField" name="entry.9876543210">
     <button type="submit" class="next-button">Submit Booking</button>
   </form>
 
   <script>
     const calendar = document.getElementById('calendar');
     const monthLabel = document.getElementById('monthLabel');
-    const form = document.getElementById('bookingForm');
+    const timeBlocksContainer = document.getElementById('timeBlocks');
     const selectedDatesField = document.getElementById('selectedDatesField');
+    const selectedTimesField = document.getElementById('selectedTimesField');
+    const form = document.getElementById('bookingForm');
+
     let currentDate = new Date();
 
     function createDayCell(date) {
@@ -100,17 +133,10 @@
 
       day.addEventListener('click', () => {
         day.classList.toggle('selected');
-        updateLocalStorage();
+        updateFormData();
       });
 
       return day;
-    }
-
-    function updateLocalStorage() {
-      const selectedDates = Array.from(document.querySelectorAll('.day.selected'))
-        .map(el => el.dataset.date);
-      localStorage.setItem('selectedDates', JSON.stringify(selectedDates));
-      selectedDatesField.value = selectedDates.join(', ');
     }
 
     function renderCalendar(date) {
@@ -138,9 +164,41 @@
       renderCalendar(currentDate);
     }
 
+    function renderTimeBlocks() {
+      const times = [];
+      let hour = 7, minute = 30;
+      while (hour < 20 || (hour === 20 && minute === 0)) {
+        times.push(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
+        minute += 30;
+        if (minute === 60) {
+          minute = 0;
+          hour += 1;
+        }
+      }
+      times.forEach(time => {
+        const block = document.createElement('div');
+        block.className = 'time-block';
+        block.textContent = time;
+        block.dataset.time = time;
+        block.onclick = () => {
+          block.classList.toggle('selected');
+          updateFormData();
+        };
+        timeBlocksContainer.appendChild(block);
+      });
+    }
+
+    function updateFormData() {
+      const selectedDates = Array.from(document.querySelectorAll('.day.selected')).map(el => el.dataset.date);
+      const selectedTimes = Array.from(document.querySelectorAll('.time-block.selected')).map(el => el.dataset.time);
+      selectedDatesField.value = selectedDates.join(', ');
+      selectedTimesField.value = selectedTimes.join(', ');
+    }
+
     form.action = "https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/formResponse";
 
     renderCalendar(currentDate);
+    renderTimeBlocks();
   </script>
 </body>
 </html>
