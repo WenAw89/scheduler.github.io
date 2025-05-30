@@ -79,11 +79,17 @@
   </div>
   <div class="calendar" id="calendar"></div>
 
-  <a href="time.html" class="next-button">Next: Select Time Blocks</a>
+  <form id="bookingForm" method="POST" target="_blank">
+    <input type="hidden" name="entry.2080923976" value="Wesley and Olaf, dogs, feed twice a day, 1 cup each time, friendly loves to bark">
+    <input type="hidden" id="selectedDatesField" name="entry.1234567890">
+    <button type="submit" class="next-button">Submit Booking</button>
+  </form>
 
   <script>
     const calendar = document.getElementById('calendar');
     const monthLabel = document.getElementById('monthLabel');
+    const form = document.getElementById('bookingForm');
+    const selectedDatesField = document.getElementById('selectedDatesField');
     let currentDate = new Date();
 
     function createDayCell(date) {
@@ -104,6 +110,7 @@
       const selectedDates = Array.from(document.querySelectorAll('.day.selected'))
         .map(el => el.dataset.date);
       localStorage.setItem('selectedDates', JSON.stringify(selectedDates));
+      selectedDatesField.value = selectedDates.join(', ');
     }
 
     function renderCalendar(date) {
@@ -115,7 +122,6 @@
 
       monthLabel.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
 
-      // Fill initial empty cells
       for (let i = 0; i < startDay; i++) {
         const emptyCell = document.createElement('div');
         calendar.appendChild(emptyCell);
@@ -131,6 +137,8 @@
       currentDate.setMonth(currentDate.getMonth() + direction);
       renderCalendar(currentDate);
     }
+
+    form.action = "https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/formResponse";
 
     renderCalendar(currentDate);
   </script>
