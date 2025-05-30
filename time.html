@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Time Blocks</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #fdfdfd;
+      text-align: center;
+    }
+    .time-blocks {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .time-block {
+      margin: 5px;
+      padding: 10px 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f0f0f0;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .time-block.selected {
+      background-color: #4caf50;
+      color: white;
+    }
+    input, textarea {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 80%;
+      max-width: 400px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Select Preferred Time Blocks</h1>
+  <div class="time-blocks" id="timeBlockContainer"></div>
+
+  <form id="bookingForm">
+    <input type="text" name="name" placeholder="Your Name" required>
+    <input type="email" name="email" placeholder="Your Email" required>
+    <textarea name="address" placeholder="Your Address" required></textarea>
+    <button type="submit">Submit Booking</button>
+  </form>
+
+  <script>
+    const container = document.getElementById('timeBlockContainer');
+    const times = [];
+    for (let hour = 7; hour <= 19; hour++) {
+      [0, 30].forEach(min => {
+        const h = hour + (min === 30 ? 0.5 : 0);
+        const t = new Date();
+        t.setHours(Math.floor(h), min);
+        const label = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        times.push(label);
+      });
+    }
+    times.push('08:00 PM');
+
+    times.forEach(time => {
+      const div = document.createElement('div');
+      div.className = 'time-block';
+      div.textContent = time;
+      div.onclick = () => div.classList.toggle('selected');
+      container.appendChild(div);
+    });
+
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const selectedTimes = Array.from(document.querySelectorAll('.time-block.selected')).map(t => t.textContent);
+      const formData = new FormData(this);
+      const name = formData.get('name');
+      const email = formData.get('email');
+      const address = formData.get('address');
+
+      const message = `Thank you ${name} for your booking.\n\nYou selected the following time blocks:\n${selectedTimes.join(', ')}\n\nAddress: ${address}`;
+
+      // Confirmation alert for client
+      alert(message);
+
+      // Optionally use mailto (limited formatting)
+      const subject = encodeURIComponent(`Booking Confirmation for ${name}`);
+      const body = encodeURIComponent(`${message}\n\nClient email: ${email}`);
+      window.location.href = `mailto:catdoggoose01@gmail.com?subject=${subject}&body=${body}`;
+    });
+  </script>
+</body>
+</html>
