@@ -113,17 +113,28 @@
   const datesTextarea = document.getElementById('dates');
   const timesTextarea = document.getElementById('times');
 
-  // Load selected dates from localStorage
-  let selectedDates = JSON.parse(localStorage.getItem('selectedDates') || "[]");
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  const selectedDatesParam = getQueryParam('dates');
+  let selectedDates = [];
+
+  if (selectedDatesParam) {
+    selectedDates = decodeURIComponent(selectedDatesParam).split(',');
+  } else {
+    // fallback to localStorage for compatibility
+    selectedDates = JSON.parse(localStorage.getItem('selectedDates') || '[]');
+  }
+
   if (selectedDates.length === 0) {
     alert('No dates selected. Redirecting to date selection.');
     window.location.href = 'index.html';
   }
 
-  // Prefill dates textarea
   datesTextarea.value = selectedDates.join(', ');
 
-  // Generate 30-minute time blocks from 7:30am to 8:00pm
   function generateTimeBlocks() {
     const times = [];
     let hour = 7;
@@ -166,7 +177,6 @@
   }
 
   function validateForm() {
-    // Enable submit button only if required fields filled and at least one time selected
     const isValid = bookingForm.name.value.trim() &&
                     bookingForm.email.value.trim() &&
                     bookingForm.phone.value.trim() &&
@@ -180,9 +190,7 @@
 
   bookingForm.addEventListener('submit', e => {
     e.preventDefault();
-    // For now, just show a confirmation alert
     alert(`Thank you, ${bookingForm.name.value}! Your booking for dates: ${datesTextarea.value} at times: ${timesTextarea.value} has been received.\nWe will contact you at ${bookingForm.email.value} or ${bookingForm.phone.value}.`);
-    // Clear localStorage and redirect back to index
     localStorage.removeItem('selectedDates');
     window.location.href = 'index.html';
   });
