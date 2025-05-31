@@ -11,11 +11,26 @@
       margin: 0 auto;
       padding: 1rem;
     }
-    h2 {
+    h2, h3, h4 {
       text-align: center;
     }
     .calendar, .timeslots, .form-container {
       margin-top: 1rem;
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .calendar-header button {
+      background-color: #007aff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.3rem 0.7rem;
+      cursor: pointer;
+      font-weight: bold;
     }
     .calendar-grid {
       display: grid;
@@ -27,6 +42,7 @@
       text-align: center;
       border: 1px solid #ccc;
       cursor: pointer;
+      user-select: none;
     }
     .day.selected {
       background-color: #007aff;
@@ -39,12 +55,14 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
+      justify-content: center;
     }
     .timeslot {
       padding: 0.5rem 1rem;
       border: 1px solid #ccc;
       border-radius: 4px;
       cursor: pointer;
+      user-select: none;
     }
     .timeslot.selected {
       background-color: #28a745;
@@ -82,7 +100,14 @@
 </head>
 <body>
   <h2>Select Dates</h2>
-  <div id="calendar" class="calendar"></div>
+  <div id="calendar" class="calendar">
+    <div class="calendar-header">
+      <button id="prevMonthBtn">&lt; Prev</button>
+      <h3 id="monthYear"></h3>
+      <button id="nextMonthBtn">Next &gt;</button>
+    </div>
+    <div id="calendarGrid" class="calendar-grid"></div>
+  </div>
   <button id="toTimeSlots">Next: Select Times</button>
 
   <div id="timeslots" class="timeslots hidden">
@@ -115,7 +140,10 @@
   </form>
 
   <script>
-    const calendar = document.getElementById('calendar');
+    const calendarGrid = document.getElementById('calendarGrid');
+    const monthYearLabel = document.getElementById('monthYear');
+    const prevMonthBtn = document.getElementById('prevMonthBtn');
+    const nextMonthBtn = document.getElementById('nextMonthBtn');
     const toTimeSlotsBtn = document.getElementById('toTimeSlots');
     const timeslotsDiv = document.getElementById('timeslots');
     const timeslotSections = document.getElementById('timeslotSections');
@@ -126,47 +154,84 @@
     let selectedDates = new Set();
     let selectedTimes = {}; // { dateStr: [time1, time2, ...] }
 
+    let currentYear, currentMonth;
+
+    function updateMonthYearLabel(year, month) {
+      const date = new Date(year, month);
+      monthYearLabel.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+    }
+
     function generateCalendar(year, month) {
-      calendar.innerHTML = '';
-      const date = new Date(year, month, 1);
-      const monthName = date.toLocaleString('default', { month: 'long' });
-      const title = document.createElement('h3');
-      title.textContent = `${monthName} ${year}`;
-      calendar.appendChild(title);
+      currentYear = year;
+      currentMonth = month;
+      updateMonthYearLabel(year, month);
 
-      const grid = document.createElement('div');
-      grid.className = 'calendar-grid';
+      calendarGrid.innerHTML = '';
 
+      // Weekday headers
+      const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      weekdays.forEach(day => {
+        const headerCell = document.createElement('div');
+        headerCell.textContent = day;
+        headerCell.style.fontWeight = 'bold';
+        headerCell.style.textAlign = 'center';
+        calendarGrid.appendChild(headerCell);
+      });
+
+      const firstDayOfMonth = new Date(year, month, 1);
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const startDay = new Date(year, month, 1).getDay();
+      const startDay = firstDayOfMonth.getDay();
 
+      // Empty slots before first day
       for (let i = 0; i < startDay; i++) {
-        const empty = document.createElement('div');
-        grid.appendChild(empty);
+        const emptyCell = document.createElement('div');
+        calendarGrid.appendChild(emptyCell);
       }
 
-      for (let d = 1; d <= daysInMonth; d++) {
-        const day = document.createElement('div');
-        day.className = 'day';
-        day.textContent = d;
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateCell = document.createElement('div');
+        dateCell.className = 'day';
+        dateCell.textContent = day;
 
-        const fullDate = new Date(year, month, d).toISOString().split('T')[0];
+        const fullDate = new Date(year, month, day).toISOString().split('T')[0];
 
-        day.onclick = () => {
+        if (selectedDates.has(fullDate)) {
+          dateCell.classList.add('selected');
+        }
+
+        dateCell.onclick = () => {
           if (selectedDates.has(fullDate)) {
             selectedDates.delete(fullDate);
-            delete selectedTimes[fullDate];
-            day.classList.remove('selected');
+            dateCell.classList.remove('selected');
           } else {
             selectedDates.add(fullDate);
-            day.classList.add('selected');
+            dateCell.classList.add('selected');
           }
         };
 
-        grid.appendChild(day);
+        calendarGrid.appendChild(dateCell);
       }
-      calendar.appendChild(grid);
     }
+
+    prevMonthBtn.onclick = () => {
+      let newMonth = currentMonth - 1;
+      let newYear = currentYear;
+      if (newMonth < 0) {
+        newMonth = 11;
+        newYear--;
+      }
+      generateCalendar(newYear, newMonth);
+    };
+
+    nextMonthBtn.onclick = () => {
+      let newMonth = currentMonth + 1;
+      let newYear = currentYear;
+      if (newMonth > 11) {
+        newMonth = 0;
+        newYear++;
+      }
+      generateCalendar(newYear, newMonth);
+    };
 
     function generateTimeBlocks() {
       const blocks = [];
@@ -229,7 +294,7 @@
         alert('Please select at least one date.');
         return;
       }
-      calendar.classList.add('hidden');
+      document.getElementById('calendar').classList.add('hidden');
       toTimeSlotsBtn.classList.add('hidden');
       timeslotsDiv.classList.remove('hidden');
       renderTimeSlots();
