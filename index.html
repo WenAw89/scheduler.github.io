@@ -3,134 +3,111 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Booking Calendar</title>
+  <title>Pet Sitting Booking</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      padding: 1rem;
       max-width: 600px;
       margin: auto;
-      padding: 1rem;
-      background: #f0f0f0;
+      background-color: #f9f9f9;
     }
-
-    h1, h2 {
+    h2 {
       text-align: center;
+      margin-top: 1rem;
     }
-
     .calendar, .week-view {
       display: grid;
-      gap: 0.5rem;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.25rem;
       margin: 1rem 0;
     }
-
-    .calendar {
-      grid-template-columns: repeat(7, 1fr);
-    }
-
-    .day {
+    .day, .week-day {
+      padding: 0.75rem;
       background: white;
-      padding: 0.5rem;
+      border: 1px solid #ccc;
       text-align: center;
       cursor: pointer;
-      border: 1px solid #ddd;
+      border-radius: 6px;
     }
-
     .day.selected {
       background-color: #007aff;
       color: white;
-      font-weight: bold;
     }
-
-    .nav-buttons, .week-nav {
+    .week-day-header {
+      font-weight: bold;
+      text-align: center;
+      padding: 0.5rem;
+    }
+    .navigation {
       display: flex;
       justify-content: space-between;
       margin: 0.5rem 0;
     }
-
     .time-blocks {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
-      margin-top: 1rem;
+      justify-content: center;
+      margin: 1rem 0;
     }
-
     .time-block {
-      background: white;
       padding: 0.5rem 1rem;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
+      background: white;
     }
-
     .time-block.selected {
-      background-color: #007aff;
+      background: #007aff;
       color: white;
-    }
-
-    .hidden {
-      display: none;
     }
   </style>
 </head>
 <body>
 
-<h1>Book Time Slots</h1>
-
-<!-- Monthly Calendar View -->
-<div class="nav-buttons">
+<h2>Select Dates</h2>
+<div class="navigation">
   <button onclick="changeMonth(-1)">Previous</button>
   <div id="monthYear"></div>
   <button onclick="changeMonth(1)">Next</button>
 </div>
 <div class="calendar" id="calendar"></div>
 
-<!-- Weekly View -->
-<div class="hidden" id="weeklyView">
-  <h2>Pick Time Slots</h2>
-  <div class="week-nav">
-    <button onclick="changeWeek(-1)">Previous Week</button>
-    <div id="weekRange"></div>
-    <button onclick="changeWeek(1)">Next Week</button>
-  </div>
-  <div class="calendar" id="weekDates"></div>
-  <div id="timeBlocksContainer"></div>
+<h2>Select Time Blocks</h2>
+<div class="navigation">
+  <button onclick="changeWeek(-1)">Previous Week</button>
+  <div id="weekRange"></div>
+  <button onclick="changeWeek(1)">Next Week</button>
 </div>
+<div class="week-view" id="weekView"></div>
+<div class="time-blocks" id="timeBlocks"></div>
 
 <script>
   const calendarEl = document.getElementById("calendar");
   const monthYearEl = document.getElementById("monthYear");
-  const weeklyView = document.getElementById("weeklyView");
-  const weekRange = document.getElementById("weekRange");
-  const weekDates = document.getElementById("weekDates");
-  const timeBlocksContainer = document.getElementById("timeBlocksContainer");
+  const weekRangeEl = document.getElementById("weekRange");
+  const weekViewEl = document.getElementById("weekView");
+  const timeBlocksEl = document.getElementById("timeBlocks");
 
-  let currentMonth = new Date().getMonth();
-  let currentYear = new Date().getFullYear();
-  let selectedDates = new Set();
-  let currentWeekOffset = 0;
+  const today = new Date();
+  let currentMonth = today.getMonth();
+  let currentYear = today.getFullYear();
+  let weekStartDate = new Date();
 
-  const TIME_BLOCKS = generateTimeBlocks();
+  const selectedDates = new Set(JSON.parse(localStorage.getItem("selectedDates") || "[]"));
 
-  function generateTimeBlocks() {
-    const blocks = [];
-    let hour = 7, minute = 30;
-    while (hour < 20 || (hour === 20 && minute === 0)) {
-      blocks.push(`${hour.toString().padStart(2,'0')}:${minute.toString().padStart(2,'0')}`);
-      minute += 30;
-      if (minute === 60) {
-        minute = 0;
-        hour++;
-      }
-    }
-    return blocks;
+  function saveSelectedDates() {
+    localStorage.setItem("selectedDates", JSON.stringify(Array.from(selectedDates)));
   }
 
   function renderCalendar() {
     calendarEl.innerHTML = "";
-    const date = new Date(currentYear, currentMonth, 1);
-    const startDay = date.getDay(); // 0 = Sunday
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const startDay = firstDay.getDay(); // 0 (Sun) - 6 (Sat)
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    monthYearEl.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    monthYearEl.textContent = `${firstDay.toLocaleString("default", { month: "long" })} ${currentYear}`;
 
     for (let i = 0; i < startDay; i++) {
       const empty = document.createElement("div");
@@ -138,114 +115,131 @@
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const d = new Date(currentYear, currentMonth, day);
-      const key = formatDate(d);
-      const div = document.createElement("div");
-      div.className = "day";
-      div.textContent = day;
+      const date = new Date(currentYear, currentMonth, day);
+      const dateStr = date.toISOString().split("T")[0];
 
-      if (selectedDates.has(key)) div.classList.add("selected");
+      const cell = document.createElement("div");
+      cell.className = "day";
+      cell.textContent = day;
+      if (selectedDates.has(dateStr)) cell.classList.add("selected");
 
-      div.onclick = () => {
-        selectedDates.add(key);
-        localStorage.setItem("selectedDates", JSON.stringify([...selectedDates]));
-        renderCalendar();
-        renderWeekView();
+      cell.onclick = () => {
+        if (selectedDates.has(dateStr)) {
+          selectedDates.delete(dateStr);
+          cell.classList.remove("selected");
+        } else {
+          selectedDates.add(dateStr);
+          cell.classList.add("selected");
+          weekStartDate = date;
+          renderWeekView();
+        }
+        saveSelectedDates();
       };
-      calendarEl.appendChild(div);
+
+      calendarEl.appendChild(cell);
     }
   }
 
-  function changeMonth(delta) {
-    currentMonth += delta;
-    if (currentMonth < 0) {
-      currentMonth = 11;
-      currentYear--;
-    } else if (currentMonth > 11) {
+  function changeMonth(diff) {
+    currentMonth += diff;
+    if (currentMonth > 11) {
       currentMonth = 0;
       currentYear++;
+    } else if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear--;
     }
     renderCalendar();
   }
 
-  function renderWeekView() {
-    weeklyView.classList.remove("hidden");
-
-    const allDates = Array.from(selectedDates).map(date => new Date(date));
-    allDates.sort((a, b) => a - b);
-
-    if (allDates.length === 0) return;
-
-    const weekDatesArr = allDates.slice(currentWeekOffset * 7, (currentWeekOffset + 1) * 7);
-    weekDates.innerHTML = "";
-    timeBlocksContainer.innerHTML = "";
-
-    if (weekDatesArr.length === 0) {
-      weekRange.textContent = "No more selected dates this week";
-      return;
-    }
-
-    const startLabel = formatDate(weekDatesArr[0]);
-    const endLabel = formatDate(weekDatesArr[weekDatesArr.length - 1]);
-    weekRange.textContent = `${startLabel} – ${endLabel}`;
-
-    weekDatesArr.forEach(dateObj => {
-      const label = document.createElement("div");
-      label.className = "day";
-      label.textContent = dateObj.toDateString();
-      label.onclick = () => renderTimeBlocksForDate(dateObj);
-      weekDates.appendChild(label);
-    });
-
-    renderTimeBlocksForDate(weekDatesArr[0]);
-  }
-
-  function renderTimeBlocksForDate(date) {
-    const dateStr = formatDate(date);
-    const selectedTimes = new Set(JSON.parse(localStorage.getItem(`slots_${dateStr}`) || "[]"));
-
-    timeBlocksContainer.innerHTML = `<h3>${date.toDateString()}</h3>`;
-    const container = document.createElement("div");
-    container.className = "time-blocks";
-
-    TIME_BLOCKS.forEach(time => {
-      const block = document.createElement("div");
-      block.className = "time-block";
-      block.textContent = time;
-      if (selectedTimes.has(time)) block.classList.add("selected");
-
-      block.onclick = () => {
-        if (selectedTimes.has(time)) {
-          selectedTimes.delete(time);
-          block.classList.remove("selected");
-        } else {
-          selectedTimes.add(time);
-          block.classList.add("selected");
-        }
-        localStorage.setItem(`slots_${dateStr}`, JSON.stringify([...selectedTimes]));
-      };
-
-      container.appendChild(block);
-    });
-
-    timeBlocksContainer.appendChild(container);
-  }
-
-  function changeWeek(delta) {
-    currentWeekOffset += delta;
+  function changeWeek(diff) {
+    weekStartDate.setDate(weekStartDate.getDate() + diff * 7);
     renderWeekView();
   }
 
-  function formatDate(d) {
-    return d.toISOString().split("T")[0];
+  function renderWeekView() {
+    weekViewEl.innerHTML = "";
+    timeBlocksEl.innerHTML = "";
+
+    const weekDates = [];
+    const start = new Date(weekStartDate);
+    start.setDate(start.getDate() - start.getDay()); // start of week (Sunday)
+
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      const dateStr = d.toISOString().split("T")[0];
+
+      const cell = document.createElement("div");
+      cell.className = "week-day";
+      cell.textContent = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      if (selectedDates.has(dateStr)) {
+        cell.style.fontWeight = "bold";
+        cell.onclick = () => renderTimeBlocksForDate(dateStr);
+      } else {
+        cell.style.opacity = 0.4;
+      }
+
+      weekViewEl.appendChild(cell);
+      weekDates.push(dateStr);
+    }
+
+    const rangeStr = `${weekDates[0]} → ${weekDates[6]}`;
+    weekRangeEl.textContent = rangeStr;
+
+    // Auto-load first selected date in week
+    const selectedInWeek = weekDates.find(date => selectedDates.has(date));
+    if (selectedInWeek) renderTimeBlocksForDate(selectedInWeek);
   }
 
-  // Initial load
-  const saved = JSON.parse(localStorage.getItem("selectedDates") || "[]");
-  selectedDates = new Set(saved);
-  renderCalendar();
-  if (selectedDates.size > 0) renderWeekView();
-</script>
+  function generateTimeBlocks() {
+    const times = [];
+    let hour = 7;
+    let minute = 30;
+    while (hour < 20 || (hour === 20 && minute === 0)) {
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour % 12 || 12;
+      const str = `${displayHour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+      times.push(str);
+      minute += 30;
+      if (minute === 60) {
+        minute = 0;
+        hour++;
+      }
+    }
+    return times;
+  }
 
+  function renderTimeBlocksForDate(dateStr) {
+    timeBlocksEl.innerHTML = "";
+    const stored = localStorage.getItem(`slots_${dateStr}`);
+    const selectedTimes = new Set(stored ? JSON.parse(stored) : []);
+    const blocks = generateTimeBlocks();
+
+    blocks.forEach(time => {
+      const div = document.createElement("div");
+      div.className = "time-block";
+      div.textContent = time;
+      if (selectedTimes.has(time)) div.classList.add("selected");
+
+      div.onclick = () => {
+        if (selectedTimes.has(time)) {
+          selectedTimes.delete(time);
+          div.classList.remove("selected");
+        } else {
+          selectedTimes.add(time);
+          div.classList.add("selected");
+        }
+        localStorage.setItem(`slots_${dateStr}`, JSON.stringify(Array.from(selectedTimes)));
+      };
+
+      timeBlocksEl.appendChild(div);
+    });
+  }
+
+  // Initialize
+  renderCalendar();
+  renderWeekView();
+</script>
 </body>
 </html>
