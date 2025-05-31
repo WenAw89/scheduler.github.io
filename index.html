@@ -1,9 +1,10 @@
+<!-- Your updated Calendar Booking Page -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calendar Booking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Days and Time</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -34,18 +35,164 @@
       margin-bottom: 2rem;
     }
 
-    .day, .empty {
+    .day {
       padding: 0.75rem;
       text-align: center;
-      border-radius: 0.5rem;
-    }
-
-    .day {
       background-color: #fff;
       border: 1px solid #ddd;
+      border-radius: 0.5rem;
       cursor: pointer;
       transition: background-color 0.2s, border 0.2s;
     }
 
     .day:hover {
-      background-color: #e
+      background-color: #e0f0ff;
+    }
+
+    .day.selected {
+      background-color: #007aff;
+      color: #fff;
+      border-color: #007aff;
+    }
+
+    .time-blocks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      max-width: 500px;
+    }
+
+    .time-block {
+      padding: 0.5rem 1rem;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+
+    .time-block.selected {
+      background-color: #007aff;
+      color: white;
+    }
+
+    .next-button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: #007aff;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .next-button:hover {
+      background-color: #005fcc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Select Days and Time Blocks</h1>
+
+  <div class="calendar-controls">
+    <button onclick="changeMonth(-1)" type="button">&lt; Prev</button>
+    <span id="monthLabel"></span>
+    <button onclick="changeMonth(1)" type="button">Next &gt;</button>
+  </div>
+
+  <div class="calendar" id="calendar"></div>
+
+  <div class="time-blocks" id="timeBlocks"></div>
+
+  <button class="next-button" onclick="redirectToGoogleForm()">Submit Booking</button>
+
+  <script>
+    const calendar = document.getElementById('calendar');
+    const monthLabel = document.getElementById('monthLabel');
+    const timeBlocksContainer = document.getElementById('timeBlocks');
+
+    let currentDate = new Date();
+
+    function createDayCell(date) {
+      const day = document.createElement('div');
+      day.className = 'day';
+      day.textContent = date.getDate();
+      day.dataset.date = date.toISOString().split('T')[0];
+
+      day.addEventListener('click', () => {
+        day.classList.toggle('selected');
+      });
+
+      return day;
+    }
+
+    function renderCalendar(date) {
+      calendar.innerHTML = '';
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const startDay = new Date(year, month, 1).getDay();
+
+      monthLabel.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+      for (let i = 0; i < startDay; i++) {
+        const emptyCell = document.createElement('div');
+        calendar.appendChild(emptyCell);
+      }
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        const dayDate = new Date(year, month, i);
+        calendar.appendChild(createDayCell(dayDate));
+      }
+    }
+
+    function changeMonth(direction) {
+      currentDate.setMonth(currentDate.getMonth() + direction);
+      renderCalendar(currentDate);
+    }
+
+    function renderTimeBlocks() {
+      const times = [];
+      let hour = 7, minute = 30;
+      while (hour < 20 || (hour === 20 && minute === 0)) {
+        times.push(${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')});
+        minute += 30;
+        if (minute === 60) {
+          minute = 0;
+          hour += 1;
+        }
+      }
+      times.forEach(time => {
+        const block = document.createElement('div');
+        block.className = 'time-block';
+        block.textContent = time;
+        block.dataset.time = time;
+        block.onclick = () => {
+          block.classList.toggle('selected');
+        };
+        timeBlocksContainer.appendChild(block);
+      });
+    }
+
+    function redirectToGoogleForm() {
+      const selectedDates = Array.from(document.querySelectorAll('.day.selected')).map(el => el.dataset.date);
+      const selectedTimes = Array.from(document.querySelectorAll('.time-block.selected')).map(el => el.dataset.time);
+
+      // Replace with your actual form URL
+      const formBaseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/viewform";
+      const params = new URLSearchParams();
+
+      // Replace these entry IDs with your actual Google Form entry IDs
+      params.set("entry.839337160", selectedDates.join(', ')); // Dates
+      params.set("entry.1726420148", selectedTimes.join(', ')); // Time blocks
+      
+      const finalUrl = ${formBaseUrl}?${params.toString()};
+      window.location.href = finalUrl;
+    }
+
+    renderCalendar(currentDate);
+    renderTimeBlocks();
+  </script>
+</body>
+</html>  
