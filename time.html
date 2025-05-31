@@ -1,97 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Select Time Blocks & Enter Info</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    max-width: 480px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-  }
-  h1 {
-    text-align: center;
-  }
-  .time-blocks {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
-    margin-bottom: 1rem;
-  }
-  .time-block {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .time-block.selected {
-    background-color: #007aff;
-    color: white;
-    font-weight: bold;
-  }
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-    margin-top: 1rem;
-  }
-  label {
-    font-weight: bold;
-  }
-  input, textarea {
-    padding: 0.5rem;
-    font-size: 1rem;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
-  textarea {
-    resize: vertical;
-  }
-  button.submit-btn {
-    background-color: #007aff;
-    color: white;
-    border: none;
-    padding: 0.75rem;
-    border-radius: 6px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    margin-top: 1rem;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Select Time Blocks & Enter Info</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 480px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    h1 {
+      text-align: center;
+    }
+    .time-blocks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .time-block {
+      padding: 0.5rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .time-block.selected {
+      background-color: #007aff;
+      color: white;
+      font-weight: bold;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+    label {
+      font-weight: bold;
+    }
+    input, textarea {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    textarea {
+      resize: vertical;
+    }
+    button.submit-btn {
+      background-color: #007aff;
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+  </style>
 </head>
 <body>
   <h1>Select Time Blocks & Enter Info</h1>
 
   <div class="time-blocks" id="timeBlocks"></div>
 
-<form id="bookingForm" action="https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/formResponse" method="POST" target="_self">
-  <label for="name">Full Name *</label>
-  <input id="name" name="entry.2005620554" type="text" required />
+  <form id="bookingForm">
+    <label for="name">Full Name *</label>
+    <input id="name" type="text" required />
 
-  <label for="email">Email *</label>
-  <input id="email" name="entry.1045781291" type="email" required />
+    <label for="email">Email *</label>
+    <input id="email" type="email" required />
 
-  <label for="phone">Phone Number *</label>
-  <input id="phone" name="entry.1166974658" type="tel" required />
+    <label for="phone">Phone Number *</label>
+    <input id="phone" type="tel" required />
 
-  <label for="address">Address *</label>
-  <input id="address" name="entry.1065046570" type="text" required />
+    <label for="address">Address *</label>
+    <input id="address" type="text" required />
 
-  <label for="pets">Tell me about your pets</label>
-  <textarea id="pets" name="entry.2080923976" rows="4" placeholder="Name, type, routine, behavior..."></textarea>
+    <label for="pets">Tell me about your pets</label>
+    <textarea id="pets" rows="4" placeholder="Name, type, routine, behavior..."></textarea>
 
-  <label>Selected Dates</label>
-  <textarea id="selectedDates" name="entry.839337160" rows="2" readonly></textarea>
+    <label>Selected Dates</label>
+    <textarea id="selectedDates" rows="2" readonly></textarea>
 
-  <label>Selected Time Blocks</label>
-  <textarea id="selectedTimes" name="entry.1726420148" rows="2" readonly></textarea>
+    <label>Selected Time Blocks</label>
+    <textarea id="selectedTimes" rows="2" readonly></textarea>
 
-  <button type="submit" class="submit-btn">Submit Booking</button>
-</form>
+    <button type="submit" class="submit-btn">Continue to Confirmation</button>
+  </form>
 
 <script>
   const timeBlocksContainer = document.getElementById('timeBlocks');
@@ -99,12 +99,28 @@
   const selectedDatesText = document.getElementById('selectedDates');
   const selectedTimesText = document.getElementById('selectedTimes');
 
+  const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/viewform?usp=pp_url";
+
+  // Mapping to Google Form entry IDs
+  const ENTRY_IDS = {
+    name: "entry.2005620554",
+    email: "entry.1045781291",
+    address: "entry.1065046570",
+    phone: "entry.1166974658",
+    dates: "entry.839337160",
+    times: "entry.1726420148",
+    pets: "entry.2080923976"
+  };
+
   // Time blocks from 7:30 AM to 8:00 PM every 30 minutes
   function generateTimeBlocks() {
     const blocks = [];
     let hour = 7, minute = 30;
     while (hour < 20 || (hour === 20 && minute === 0)) {
-      blocks.push(`${hour.toString().padStart(2,'0')}:${minute.toString().padStart(2,'0')}`);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      let displayHour = hour % 12 || 12;
+      const timeStr = `${displayHour}:${minute.toString().padStart(2,'0')} ${ampm}`;
+      blocks.push(timeStr);
       minute += 30;
       if (minute === 60) {
         minute = 0;
@@ -140,7 +156,6 @@
     selectedTimesText.value = Array.from(selectedTimes).join(', ');
   }
 
-  // Load selected dates from localStorage and show in readonly field
   function loadSelectedDates() {
     const savedDates = localStorage.getItem('selectedDates');
     if (savedDates) {
@@ -152,37 +167,38 @@
     e.preventDefault();
 
     if (selectedTimes.size === 0) {
-      alert('Please select at least one time block.');
+      alert("Please select at least one time block.");
       return;
     }
 
-    // Collect data to submit or send email (you can integrate with email sending API here)
-    const bookingData = {
-      name: bookingForm.name.value.trim(),
-      email: bookingForm.email.value.trim(),
-      phone: bookingForm.phone.value.trim(),
-      address: bookingForm.address.value.trim(),
-      pets: bookingForm.pets.value.trim(),
-      dates: selectedDatesText.value,
-      times: Array.from(selectedTimes).join(', ')
-    };
+    const name = bookingForm.name.value.trim();
+    const email = bookingForm.email.value.trim();
+    const phone = bookingForm.phone.value.trim();
+    const address = bookingForm.address.value.trim();
+    const pets = bookingForm.pets.value.trim();
+    const dates = selectedDatesText.value;
+    const times = Array.from(selectedTimes).join(", ");
 
-    // For now, just show confirmation alert
-    alert(
-      `Booking Submitted!\n\nName: ${bookingData.name}\nEmail: ${bookingData.email}\nPhone: ${bookingData.phone}\nAddress: ${bookingData.address}\nDates: ${bookingData.dates}\nTimes: ${bookingData.times}\nPets: ${bookingData.pets}`
-    );
+    // Construct Google Form prefilled URL
+    const params = new URLSearchParams({
+      [ENTRY_IDS.name]: name,
+      [ENTRY_IDS.email]: email,
+      [ENTRY_IDS.phone]: phone,
+      [ENTRY_IDS.address]: address,
+      [ENTRY_IDS.dates]: dates,
+      [ENTRY_IDS.times]: times,
+      [ENTRY_IDS.pets]: pets
+    });
 
-    // Clear storage and form if needed
+    const prefilledURL = `${GOOGLE_FORM_URL}&${params.toString()}`;
+
+    // Clear localStorage
     localStorage.removeItem('selectedDates');
-    bookingForm.reset();
-    selectedTimes.clear();
-    updateSelectedTimes();
 
-    // Redirect back to calendar or thank you page if you want
-    window.location.href = 'index.html';
+    // Redirect to the Google Form
+    window.location.href = prefilledURL;
   };
 
-  // Initialize
   renderTimeBlocks();
   loadSelectedDates();
   updateSelectedTimes();
