@@ -11,26 +11,11 @@
       margin: 0 auto;
       padding: 1rem;
     }
-    h2, h3, h4 {
+    h2 {
       text-align: center;
     }
     .calendar, .timeslots, .form-container {
       margin-top: 1rem;
-    }
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-    .calendar-header button {
-      background-color: #007aff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 0.3rem 0.7rem;
-      cursor: pointer;
-      font-weight: bold;
     }
     .calendar-grid {
       display: grid;
@@ -42,7 +27,6 @@
       text-align: center;
       border: 1px solid #ccc;
       cursor: pointer;
-      user-select: none;
     }
     .day.selected {
       background-color: #007aff;
@@ -55,14 +39,12 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
-      justify-content: center;
     }
     .timeslot {
       padding: 0.5rem 1rem;
       border: 1px solid #ccc;
       border-radius: 4px;
       cursor: pointer;
-      user-select: none;
     }
     .timeslot.selected {
       background-color: #28a745;
@@ -100,14 +82,7 @@
 </head>
 <body>
   <h2>Select Dates</h2>
-  <div id="calendar" class="calendar">
-    <div class="calendar-header">
-      <button id="prevMonthBtn">&lt; Prev</button>
-      <h3 id="monthYear"></h3>
-      <button id="nextMonthBtn">Next &gt;</button>
-    </div>
-    <div id="calendarGrid" class="calendar-grid"></div>
-  </div>
+  <div id="calendar" class="calendar"></div>
   <button id="toTimeSlots">Next: Select Times</button>
 
   <div id="timeslots" class="timeslots hidden">
@@ -140,10 +115,7 @@
   </form>
 
   <script>
-    const calendarGrid = document.getElementById('calendarGrid');
-    const monthYearLabel = document.getElementById('monthYear');
-    const prevMonthBtn = document.getElementById('prevMonthBtn');
-    const nextMonthBtn = document.getElementById('nextMonthBtn');
+    const calendar = document.getElementById('calendar');
     const toTimeSlotsBtn = document.getElementById('toTimeSlots');
     const timeslotsDiv = document.getElementById('timeslots');
     const timeslotSections = document.getElementById('timeslotSections');
@@ -154,84 +126,93 @@
     let selectedDates = new Set();
     let selectedTimes = {}; // { dateStr: [time1, time2, ...] }
 
-    let currentYear, currentMonth;
-
-    function updateMonthYearLabel(year, month) {
-      const date = new Date(year, month);
-      monthYearLabel.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
-    }
-
     function generateCalendar(year, month) {
-      currentYear = year;
-      currentMonth = month;
-      updateMonthYearLabel(year, month);
+      calendar.innerHTML = '';
+      const date = new Date(year, month, 1);
+      const monthName = date.toLocaleString('default', { month: 'long' });
+      const title = document.createElement('h3');
+      title.textContent = `${monthName} ${year}`;
+      calendar.appendChild(title);
 
-      calendarGrid.innerHTML = '';
+      // Add navigation buttons
+      const navContainer = document.createElement('div');
+      navContainer.style.textAlign = 'center';
+      navContainer.style.marginBottom = '10px';
 
-      // Weekday headers
-      const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      weekdays.forEach(day => {
-        const headerCell = document.createElement('div');
-        headerCell.textContent = day;
-        headerCell.style.fontWeight = 'bold';
-        headerCell.style.textAlign = 'center';
-        calendarGrid.appendChild(headerCell);
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = 'Previous Month';
+      prevBtn.onclick = () => {
+        let newMonth = month - 1;
+        let newYear = year;
+        if (newMonth < 0) {
+          newMonth = 11;
+          newYear--;
+        }
+        generateCalendar(newYear, newMonth);
+      };
+
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = 'Next Month';
+      nextBtn.style.marginLeft = '10px';
+      nextBtn.onclick = () => {
+        let newMonth = month + 1;
+        let newYear = year;
+        if (newMonth > 11) {
+          newMonth = 0;
+          newYear++;
+        }
+        generateCalendar(newYear, newMonth);
+      };
+
+      navContainer.appendChild(prevBtn);
+      navContainer.appendChild(nextBtn);
+      calendar.appendChild(navContainer);
+
+      const grid = document.createElement('div');
+      grid.className = 'calendar-grid';
+
+      // Add day names header
+      ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(dayName => {
+        const dayHeader = document.createElement('div');
+        dayHeader.style.fontWeight = 'bold';
+        dayHeader.style.textAlign = 'center';
+        dayHeader.textContent = dayName;
+        grid.appendChild(dayHeader);
       });
 
-      const firstDayOfMonth = new Date(year, month, 1);
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const startDay = firstDayOfMonth.getDay();
+      const startDay = new Date(year, month, 1).getDay();
 
-      // Empty slots before first day
       for (let i = 0; i < startDay; i++) {
-        const emptyCell = document.createElement('div');
-        calendarGrid.appendChild(emptyCell);
+        const empty = document.createElement('div');
+        grid.appendChild(empty);
       }
 
-      for (let day = 1; day <= daysInMonth; day++) {
-        const dateCell = document.createElement('div');
-        dateCell.className = 'day';
-        dateCell.textContent = day;
+      for (let d = 1; d <= daysInMonth; d++) {
+        const day = document.createElement('div');
+        day.className = 'day';
+        day.textContent = d;
 
-        const fullDate = new Date(year, month, day).toISOString().split('T')[0];
+        const fullDate = new Date(year, month, d).toISOString().split('T')[0];
 
-        if (selectedDates.has(fullDate)) {
-          dateCell.classList.add('selected');
-        }
-
-        dateCell.onclick = () => {
+        day.onclick = () => {
           if (selectedDates.has(fullDate)) {
             selectedDates.delete(fullDate);
-            dateCell.classList.remove('selected');
+            day.classList.remove('selected');
           } else {
             selectedDates.add(fullDate);
-            dateCell.classList.add('selected');
+            day.classList.add('selected');
           }
         };
 
-        calendarGrid.appendChild(dateCell);
+        if (selectedDates.has(fullDate)) {
+          day.classList.add('selected');
+        }
+
+        grid.appendChild(day);
       }
+      calendar.appendChild(grid);
     }
-
-    prevMonthBtn.onclick = () => {
-      let newMonth = currentMonth - 1;
-      let newYear = currentYear;
-      if (newMonth < 0) {
-        newMonth = 11;
-        newYear--;
-      }
-      generateCalendar(newYear, newMonth);
-    };
-
-    nextMonthBtn.onclick = () => {
-      let newMonth = currentMonth + 1;
-      let newYear = currentYear;
-      if (newMonth > 11) {
-        newMonth = 0;
-        newYear++;
-      }
-      generateCalendar(newYear, newMonth);
-    };
 
     function generateTimeBlocks() {
       const blocks = [];
@@ -294,7 +275,7 @@
         alert('Please select at least one date.');
         return;
       }
-      document.getElementById('calendar').classList.add('hidden');
+      calendar.classList.add('hidden');
       toTimeSlotsBtn.classList.add('hidden');
       timeslotsDiv.classList.remove('hidden');
       renderTimeSlots();
@@ -316,8 +297,29 @@
 
     bookingForm.onsubmit = (e) => {
       e.preventDefault();
-      alert('Booking submitted successfully!');
-      location.reload();
+
+      // Collect values from your form fields
+      const name = encodeURIComponent(document.getElementById('name').value);
+      const email = encodeURIComponent(document.getElementById('email').value);
+      const address = encodeURIComponent(document.getElementById('address').value);
+      const phone = encodeURIComponent(document.getElementById('phone').value);
+      const pets = encodeURIComponent(document.getElementById('pets').value);
+      const datesTimes = encodeURIComponent(summary.value.trim());
+
+      // Construct Google Form autofill URL
+      const baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/viewform?usp=pp_url';
+
+      // Append your entry fields with values
+      const url = `${baseURL}` +
+        `&entry.2005620554=${name}` +
+        `&entry.1045781291=${email}` +
+        `&entry.1065046570=${address}` +
+        `&entry.1166974658=${phone}` +
+        `&entry.839337160=${datesTimes}` +
+        `&entry.2080923976=${pets}`;
+
+      // Redirect user to Google Form with autofill
+      window.location.href = url;
     };
 
     const today = new Date();
