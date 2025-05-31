@@ -68,30 +68,30 @@
 
   <div class="time-blocks" id="timeBlocks"></div>
 
-  <form id="bookingForm">
-    <label for="name">Full Name *</label>
-    <input id="name" type="text" required />
+<form id="bookingForm" action="https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/formResponse" method="POST" target="_self">
+  <label for="name">Full Name *</label>
+  <input id="name" name="entry.2005620554" type="text" required />
 
-    <label for="email">Email *</label>
-    <input id="email" type="email" required />
+  <label for="email">Email *</label>
+  <input id="email" name="entry.1045781291" type="email" required />
 
-    <label for="phone">Phone Number *</label>
-    <input id="phone" type="tel" required />
+  <label for="phone">Phone Number *</label>
+  <input id="phone" name="entry.1166974658" type="tel" required />
 
-    <label for="address">Address *</label>
-    <input id="address" type="text" required />
+  <label for="address">Address *</label>
+  <input id="address" name="entry.1065046570" type="text" required />
 
-    <label for="pets">Tell me about your pets</label>
-    <textarea id="pets" rows="4" placeholder="Name, type, routine, behavior..."></textarea>
+  <label for="pets">Tell me about your pets</label>
+  <textarea id="pets" name="entry.2080923976" rows="4" placeholder="Name, type, routine, behavior..."></textarea>
 
-    <label>Selected Dates</label>
-    <textarea id="selectedDates" rows="2" readonly></textarea>
+  <label>Selected Dates</label>
+  <textarea id="selectedDates" name="entry.839337160" rows="2" readonly></textarea>
 
-    <label>Selected Time Blocks</label>
-    <textarea id="selectedTimes" rows="2" readonly></textarea>
+  <label>Selected Time Blocks</label>
+  <textarea id="selectedTimes" name="entry.1726420148" rows="2" readonly></textarea>
 
-    <button type="submit" class="submit-btn">Submit Booking</button>
-  </form>
+  <button type="submit" class="submit-btn">Submit Booking</button>
+</form>
 
 <script>
   const timeBlocksContainer = document.getElementById('timeBlocks');
