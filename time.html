@@ -1,105 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Select Time Blocks</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #fdfdfd;
-      text-align: center;
-    }
-    .time-blocks {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin: 20px 0;
-    }
-    .time-block {
-      margin: 5px;
-      padding: 10px 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      background-color: #f0f0f0;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    .time-block.selected {
-      background-color: #4caf50;
-      color: white;
-    }
-    input, textarea {
-      display: block;
-      margin: 10px auto;
-      padding: 10px;
-      width: 80%;
-      max-width: 400px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 1em;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 15px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Select Time Blocks & Booking Form</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 480px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    background: #f9f9f9;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .time-blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+  }
+  .time-block {
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .time-block.selected {
+    background: #007aff;
+    color: white;
+    border-color: #005fcc;
+  }
+  form {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 0 7px #ccc;
+  }
+  label {
+    display: block;
+    margin: 0.6rem 0 0.3rem;
+    font-weight: bold;
+  }
+  input, textarea {
+    width: 100%;
+    padding: 0.4rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  textarea {
+    resize: vertical;
+  }
+  button.submit-btn {
+    margin-top: 1rem;
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1.1rem;
+    background: #007aff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button.submit-btn:disabled {
+    background: #99caff;
+    cursor: default;
+  }
+</style>
 </head>
 <body>
-  <h1>Select Preferred Time Blocks</h1>
-  <div class="time-blocks" id="timeBlockContainer"></div>
 
-  <form id="bookingForm">
-    <input type="text" name="name" placeholder="Your Name" required>
-    <input type="email" name="email" placeholder="Your Email" required>
-    <textarea name="address" placeholder="Your Address" required></textarea>
-    <button type="submit">Submit Booking</button>
-  </form>
+<h1>Select Time Blocks</h1>
+<div class="time-blocks" id="timeBlocks"></div>
 
-  <script>
-    const container = document.getElementById('timeBlockContainer');
+<h1>Booking Information</h1>
+<form id="bookingForm">
+  <label for="name">Full Name *</label>
+  <input type="text" id="name" name="name" required />
+
+  <label for="email">Email *</label>
+  <input type="email" id="email" name="email" required />
+
+  <label for="phone">Phone Number *</label>
+  <input type="tel" id="phone" name="phone" required />
+
+  <label for="address">Address *</label>
+  <textarea id="address" name="address" rows="2" required></textarea>
+
+  <label for="dates">Selected Dates *</label>
+  <textarea id="dates" name="dates" rows="2" readonly required></textarea>
+
+  <label for="times">Selected Time Blocks *</label>
+  <textarea id="times" name="times" rows="2" readonly required></textarea>
+
+  <label for="pets">Tell me about your pets *</label>
+  <textarea id="pets" name="pets" rows="3" required></textarea>
+
+  <button type="submit" class="submit-btn" disabled>Submit Booking</button>
+</form>
+
+<script>
+  const timeBlocksContainer = document.getElementById('timeBlocks');
+  const bookingForm = document.getElementById('bookingForm');
+  const submitBtn = bookingForm.querySelector('button.submit-btn');
+  const datesTextarea = document.getElementById('dates');
+  const timesTextarea = document.getElementById('times');
+
+  // Load selected dates from localStorage
+  let selectedDates = JSON.parse(localStorage.getItem('selectedDates') || "[]");
+  if (selectedDates.length === 0) {
+    alert('No dates selected. Redirecting to date selection.');
+    window.location.href = 'index.html';
+  }
+
+  // Prefill dates textarea
+  datesTextarea.value = selectedDates.join(', ');
+
+  // Generate 30-minute time blocks from 7:30am to 8:00pm
+  function generateTimeBlocks() {
     const times = [];
-    for (let hour = 7; hour <= 19; hour++) {
-      [0, 30].forEach(min => {
-        const h = hour + (min === 30 ? 0.5 : 0);
-        const t = new Date();
-        t.setHours(Math.floor(h), min);
-        const label = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        times.push(label);
-      });
+    let hour = 7;
+    let minute = 30;
+    while(hour < 20 || (hour === 20 && minute === 0)) {
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      let displayHour = hour % 12 || 12;
+      const timeStr = `${displayHour}:${minute.toString().padStart(2,'0')} ${ampm}`;
+      times.push(timeStr);
+      minute += 30;
+      if(minute === 60) {
+        minute = 0;
+        hour++;
+      }
     }
-    times.push('08:00 PM');
+    return times;
+  }
 
+  function renderTimeBlocks() {
+    const times = generateTimeBlocks();
     times.forEach(time => {
-      const div = document.createElement('div');
-      div.className = 'time-block';
-      div.textContent = time;
-      div.onclick = () => div.classList.toggle('selected');
-      container.appendChild(div);
+      const block = document.createElement('div');
+      block.className = 'time-block';
+      block.textContent = time;
+      block.dataset.time = time;
+      block.addEventListener('click', () => {
+        block.classList.toggle('selected');
+        updateSelectedTimes();
+        validateForm();
+      });
+      timeBlocksContainer.appendChild(block);
     });
+  }
 
-    document.getElementById('bookingForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const selectedTimes = Array.from(document.querySelectorAll('.time-block.selected')).map(t => t.textContent);
-      const formData = new FormData(this);
-      const name = formData.get('name');
-      const email = formData.get('email');
-      const address = formData.get('address');
+  let selectedTimes = [];
 
-      const message = `Thank you ${name} for your booking.\n\nYou selected the following time blocks:\n${selectedTimes.join(', ')}\n\nAddress: ${address}`;
+  function updateSelectedTimes() {
+    selectedTimes = Array.from(document.querySelectorAll('.time-block.selected')).map(el => el.dataset.time);
+    timesTextarea.value = selectedTimes.join(', ');
+  }
 
-      // Confirmation alert for client
-      alert(message);
+  function validateForm() {
+    // Enable submit button only if required fields filled and at least one time selected
+    const isValid = bookingForm.name.value.trim() &&
+                    bookingForm.email.value.trim() &&
+                    bookingForm.phone.value.trim() &&
+                    bookingForm.address.value.trim() &&
+                    bookingForm.pets.value.trim() &&
+                    selectedTimes.length > 0;
+    submitBtn.disabled = !isValid;
+  }
 
-      // Optionally use mailto (limited formatting)
-      const subject = encodeURIComponent(`Booking Confirmation for ${name}`);
-      const body = encodeURIComponent(`${message}\n\nClient email: ${email}`);
-      window.location.href = `mailto:catdoggoose01@gmail.com?subject=${subject}&body=${body}`;
-    });
-  </script>
+  bookingForm.addEventListener('input', validateForm);
+
+  bookingForm.addEventListener('submit', e => {
+    e.preventDefault();
+    // For now, just show a confirmation alert
+    alert(`Thank you, ${bookingForm.name.value}! Your booking for dates: ${datesTextarea.value} at times: ${timesTextarea.value} has been received.\nWe will contact you at ${bookingForm.email.value} or ${bookingForm.phone.value}.`);
+    // Clear localStorage and redirect back to index
+    localStorage.removeItem('selectedDates');
+    window.location.href = 'index.html';
+  });
+
+  renderTimeBlocks();
+  validateForm();
+</script>
+
 </body>
 </html>
