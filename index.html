@@ -156,7 +156,7 @@
       const times = [];
       let hour = 7, minute = 30;
       while (hour < 20 || (hour === 20 && minute === 0)) {
-        times.push(${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')});
+        times.push(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
         minute += 30;
         if (minute === 60) {
           minute = 0;
@@ -186,8 +186,9 @@
       // Replace these entry IDs with your actual Google Form entry IDs
       params.set("entry.839337160", selectedDates.join(', ')); // Dates
       params.set("entry.1726420148", selectedTimes.join(', ')); // Time blocks
-      
-      const finalUrl = ${formBaseUrl}?${params.toString()};
+
+
+      const finalUrl = `${formBaseUrl}?${params.toString()}`;
       window.location.href = finalUrl;
     }
 
@@ -195,4 +196,4 @@
     renderTimeBlocks();
   </script>
 </body>
-</html>  
+</html>
