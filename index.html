@@ -102,26 +102,12 @@
 
   <div class="time-blocks" id="timeBlocks"></div>
 
-  <form id="bookingForm" method="POST" target="_blank">
-    <label>Name: <input name="entry.1000000001" required></label><br><br>
-    <label>Email: <input type="email" name="entry.1000000002" required></label><br><br>
-    <label>Phone Number: <input name="entry.1000000004" required></label><br><br>
-    <label>Address: <input name="entry.1000000003" required></label><br><br>
-    <label>Tell me about your pets:<br>
-      <textarea name="entry.2080923976" rows="4" cols="50" required placeholder="Name, cat/dog/chicken/goose, daily routine, behavior..."></textarea>
-    </label><br><br>
-    <input type="hidden" id="selectedDatesField" name="entry.1234567890">
-    <input type="hidden" id="selectedTimesField" name="entry.9876543210">
-    <button type="submit" class="next-button">Submit Booking</button>
-  </form>
+  <button class="next-button" onclick="redirectToGoogleForm()">Submit Booking</button>
 
   <script>
     const calendar = document.getElementById('calendar');
     const monthLabel = document.getElementById('monthLabel');
     const timeBlocksContainer = document.getElementById('timeBlocks');
-    const selectedDatesField = document.getElementById('selectedDatesField');
-    const selectedTimesField = document.getElementById('selectedTimesField');
-    const form = document.getElementById('bookingForm');
 
     let currentDate = new Date();
 
@@ -133,7 +119,6 @@
 
       day.addEventListener('click', () => {
         day.classList.toggle('selected');
-        updateFormData();
       });
 
       return day;
@@ -182,24 +167,27 @@
         block.dataset.time = time;
         block.onclick = () => {
           block.classList.toggle('selected');
-          updateFormData();
         };
         timeBlocksContainer.appendChild(block);
       });
     }
 
-    function updateFormData() {
+    function redirectToGoogleForm() {
       const selectedDates = Array.from(document.querySelectorAll('.day.selected')).map(el => el.dataset.date);
       const selectedTimes = Array.from(document.querySelectorAll('.time-block.selected')).map(el => el.dataset.time);
-      selectedDatesField.value = selectedDates.join(', ');
-      selectedTimesField.value = selectedTimes.join(', ');
-    }
+      const formBaseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/viewform";
+      const params = new URLSearchParams();
 
-    form.action = "https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/formResponse";
+      // You can update entry numbers according to your form's actual field IDs
+      params.set("entry.1514384530", selectedDates.join(', ')); // Dates
+      params.set("entry.1883409824", selectedTimes.join(', ')); // Times
+
+      const finalUrl = `${formBaseUrl}?${params.toString()}`;
+      window.location.href = finalUrl;
+    }
 
     renderCalendar(currentDate);
     renderTimeBlocks();
   </script>
 </body>
 </html>
-
