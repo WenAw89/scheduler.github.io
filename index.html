@@ -1,179 +1,193 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2025 Year Calendar Multi-Select</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f9f9f9;
-    padding: 20px;
-    margin: 0;
-    color: #333;
-  }
-  h1 {
-    text-align: center;
-  }
-  .year-calendar {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    max-width: 1200px;
-    margin: 20px auto;
-  }
-  .month {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    padding: 10px;
-  }
-  .month-name {
-    text-align: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-  }
-  .weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    font-weight: bold;
-    font-size: 0.8rem;
-    color: #666;
-    margin-bottom: 4px;
-    user-select: none;
-  }
-  .weekdays div {
-    text-align: center;
-  }
-  .days {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-  }
-  .day {
-    text-align: center;
-    padding: 6px 0;
-    cursor: pointer;
-    border-radius: 6px;
-    user-select: none;
-    font-size: 0.9rem;
-    border: 1px solid transparent;
-  }
-  .day:hover:not(.disabled):not(.selected) {
-    background-color: #d0eaff;
-  }
-  .day.disabled {
-    color: #bbb;
-    cursor: default;
-  }
-  .day.selected {
-    background-color: #007aff;
-    color: white;
-    font-weight: bold;
-    border-color: #005fcc;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Days and Time</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .calendar-controls {
+      margin-bottom: 1rem;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+      max-width: 500px;
+      margin-bottom: 2rem;
+    }
+
+    .day {
+      padding: 0.75rem;
+      text-align: center;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s, border 0.2s;
+    }
+
+    .day:hover {
+      background-color: #e0f0ff;
+    }
+
+    .day.selected {
+      background-color: #007aff;
+      color: #fff;
+      border-color: #007aff;
+    }
+
+    .time-blocks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      max-width: 500px;
+    }
+
+    .time-block {
+      padding: 0.5rem 1rem;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+
+    .time-block.selected {
+      background-color: #007aff;
+      color: white;
+    }
+
+    .next-button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: #007aff;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .next-button:hover {
+      background-color: #005fcc;
+    }
+  </style>
 </head>
 <body>
+  <h1>Select Days and Time Blocks</h1>
+  <div class="calendar-controls">
+    <button onclick="changeMonth(-1)" type="button">&lt; Prev</button>
+    <span id="monthLabel"></span>
+    <button onclick="changeMonth(1)" type="button">Next &gt;</button>
+  </div>
+  <div class="calendar" id="calendar"></div>
 
-<h1>Select Booking Dates for 2025</h1>
+  <div class="time-blocks" id="timeBlocks"></div>
 
-<div class="year-calendar" id="yearCalendar"></div>
+  <button class="next-button" onclick="redirectToGoogleForm()">Submit Booking</button>
 
-<script>
-  const year = 2025;
-  const yearCalendar = document.getElementById('yearCalendar');
-  let selectedDates = JSON.parse(localStorage.getItem('selectedDates')) || [];
+  <script>
+    const calendar = document.getElementById('calendar');
+    const monthLabel = document.getElementById('monthLabel');
+    const timeBlocksContainer = document.getElementById('timeBlocks');
 
-  function formatDate(date) {
-    return date.toISOString().split('T')[0];
-  }
+    let currentDate = new Date();
 
-  function createMonth(monthIndex) {
-    const monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
+    function createDayCell(date) {
+      const day = document.createElement('div');
+      day.className = 'day';
+      day.textContent = date.getDate();
+      day.dataset.date = date.toISOString().split('T')[0];
 
-    const monthDiv = document.createElement('div');
-    monthDiv.className = 'month';
+      day.addEventListener('click', () => {
+        day.classList.toggle('selected');
+      });
 
-    // Month title
-    const title = document.createElement('div');
-    title.className = 'month-name';
-    title.textContent = monthNames[monthIndex];
-    monthDiv.appendChild(title);
-
-    // Weekday headers
-    const weekdays = document.createElement('div');
-    weekdays.className = 'weekdays';
-    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(d => {
-      const wd = document.createElement('div');
-      wd.textContent = d;
-      weekdays.appendChild(wd);
-    });
-    monthDiv.appendChild(weekdays);
-
-    // Days grid
-    const daysGrid = document.createElement('div');
-    daysGrid.className = 'days';
-
-    const firstDay = new Date(year, monthIndex, 1);
-    const lastDay = new Date(year, monthIndex + 1, 0);
-    const daysInMonth = lastDay.getDate();
-
-    // Blank days before first day of month (to align weekdays)
-    const startingDay = firstDay.getDay();
-    for (let i = 0; i < startingDay; i++) {
-      const emptyCell = document.createElement('div');
-      emptyCell.className = 'day disabled';
-      daysGrid.appendChild(emptyCell);
+      return day;
     }
 
-    // Add actual days
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    function renderCalendar(date) {
+      calendar.innerHTML = '';
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const startDay = new Date(year, month, 1).getDay();
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateObj = new Date(year, monthIndex, day);
-      const dateStr = formatDate(dateObj);
-      const dayDiv = document.createElement('div');
-      dayDiv.className = 'day';
-      dayDiv.textContent = day;
-      dayDiv.dataset.date = dateStr;
+      monthLabel.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
 
-      // Disable past dates (if before today)
-      if (dateObj < today) {
-        dayDiv.classList.add('disabled');
-      } else {
-        if (selectedDates.includes(dateStr)) {
-          dayDiv.classList.add('selected');
-        }
-        dayDiv.addEventListener('click', () => {
-          if (dayDiv.classList.contains('selected')) {
-            dayDiv.classList.remove('selected');
-            selectedDates = selectedDates.filter(d => d !== dateStr);
-          } else {
-            selectedDates.push(dateStr);
-            dayDiv.classList.add('selected');
-          }
-          localStorage.setItem('selectedDates', JSON.stringify(selectedDates));
-        });
+      for (let i = 0; i < startDay; i++) {
+        const emptyCell = document.createElement('div');
+        calendar.appendChild(emptyCell);
       }
-      daysGrid.appendChild(dayDiv);
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        const dayDate = new Date(year, month, i);
+        calendar.appendChild(createDayCell(dayDate));
+      }
     }
 
-    monthDiv.appendChild(daysGrid);
-    return monthDiv;
-  }
+    function changeMonth(direction) {
+      currentDate.setMonth(currentDate.getMonth() + direction);
+      renderCalendar(currentDate);
+    }
 
-  // Render all 12 months
-  for (let m = 0; m < 12; m++) {
-    yearCalendar.appendChild(createMonth(m));
-  }
-</script>
+    function renderTimeBlocks() {
+      const times = [];
+      let hour = 7, minute = 30;
+      while (hour < 20 || (hour === 20 && minute === 0)) {
+        times.push(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
+        minute += 30;
+        if (minute === 60) {
+          minute = 0;
+          hour += 1;
+        }
+      }
+      times.forEach(time => {
+        const block = document.createElement('div');
+        block.className = 'time-block';
+        block.textContent = time;
+        block.dataset.time = time;
+        block.onclick = () => {
+          block.classList.toggle('selected');
+        };
+        timeBlocksContainer.appendChild(block);
+      });
+    }
 
+    function redirectToGoogleForm() {
+      const selectedDates = Array.from(document.querySelectorAll('.day.selected')).map(el => el.dataset.date);
+      const selectedTimes = Array.from(document.querySelectorAll('.time-block.selected')).map(el => el.dataset.time);
+      const formBaseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/viewform";
+      const params = new URLSearchParams();
+
+      // You can update entry numbers according to your form's actual field IDs
+      params.set("entry.1514384530", selectedDates.join(', ')); // Dates
+      params.set("entry.1883409824", selectedTimes.join(', ')); // Times
+
+      const finalUrl = `${formBaseUrl}?${params.toString()}`;
+      window.location.href = finalUrl;
+    }
+
+    renderCalendar(currentDate);
+    renderTimeBlocks();
+  </script>
 </body>
 </html>
