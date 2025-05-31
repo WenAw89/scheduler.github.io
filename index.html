@@ -3,17 +3,36 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Multi-date & Time Slot Booking</title>
+<title>Multi-month Calendar with Time Slot Booking</title>
 <style>
   body {
     font-family: Arial, sans-serif;
-    max-width: 600px;
+    max-width: 700px;
     margin: 2rem auto;
     padding: 1rem;
     background: #f5f5f5;
   }
   h1 {
     text-align: center;
+  }
+  #calendarHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  #calendarHeader button {
+    background: #007aff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  #calendarHeader h2 {
+    margin: 0;
+    font-weight: 700;
   }
   #calendar {
     display: grid;
@@ -26,7 +45,7 @@
   }
   .day-name, .date-cell {
     text-align: center;
-    padding: 6px 0;
+    padding: 8px 0;
   }
   .day-name {
     font-weight: bold;
@@ -39,6 +58,7 @@
     border-radius: 6px;
     background: #e0e0e0;
     color: #333;
+    transition: background-color 0.3s;
   }
   .date-cell.today {
     border: 2px solid #007aff;
@@ -80,6 +100,7 @@
     user-select: none;
     background: white;
     color: #333;
+    transition: background-color 0.2s;
   }
   .time-block.selected {
     background-color: #007aff;
@@ -122,6 +143,12 @@
 
 <h1>Select Dates and Times</h1>
 
+<div id="calendarHeader">
+  <button id="prevMonthBtn">&lt; Prev</button>
+  <h2 id="monthYear"></h2>
+  <button id="nextMonthBtn">Next &gt;</button>
+</div>
+
 <div id="calendar"></div>
 
 <div id="timeSlotsContainer" style="display:none;">
@@ -149,28 +176,26 @@
 </form>
 
 <script>
-// Constants
+// Variables and elements
 const calendarEl = document.getElementById('calendar');
+const monthYearEl = document.getElementById('monthYear');
+const prevMonthBtn = document.getElementById('prevMonthBtn');
+const nextMonthBtn = document.getElementById('nextMonthBtn');
 const timeSlotsContainer = document.getElementById('timeSlotsContainer');
 const timeSlotsTitle = document.getElementById('timeSlotsTitle');
 const timeBlocksEl = document.getElementById('timeBlocks');
 
 const today = new Date();
 let currentYear = today.getFullYear();
-let currentMonth = today.getMonth(); // 0-indexed
-const selectedDates = new Set(); // store yyyy-mm-dd string dates
-const selectedTimesByDate = {};  // { "yyyy-mm-dd": [ "7:30 AM", ... ] }
+let currentMonth = today.getMonth();
 
-// Generate day names
+const selectedDates = new Set();
+const selectedTimesByDate = {};
+
+// Day names for calendar header
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-dayNames.forEach(day => {
-  const dayEl = document.createElement('div');
-  dayEl.className = 'day-name';
-  dayEl.textContent = day;
-  calendarEl.appendChild(dayEl);
-});
 
-// Helper: format date to yyyy-mm-dd string
+// Helpers
 function formatDate(date) {
   const y = date.getFullYear();
   const m = (date.getMonth() + 1).toString().padStart(2,'0');
@@ -178,59 +203,79 @@ function formatDate(date) {
   return `${y}-${m}-${d}`;
 }
 
-// Helper: display date nicely for user
 function displayDate(dateStr) {
   const date = new Date(dateStr);
   return date.toDateString();
 }
 
-// Generate calendar days for current month + some padding
+// Render calendar grid
 function generateCalendar(year, month) {
-  calendarEl.querySelectorAll('.date-cell').forEach(el => el.remove());
+  calendarEl.innerHTML = '';
+  // Show day names
+  dayNames.forEach(day => {
+    const dayEl = document.createElement('div');
+    dayEl.className = 'day-name';
+    dayEl.textContent = day;
+    calendarEl.appendChild(dayEl);
+  });
 
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const daysInMonth = lastDay.getDate();
-  const startWeekDay = firstDay.getDay(); // Sun=0
+  const startWeekDay = firstDay.getDay();
 
-  // Previous month filler days
+  // Fill empty cells before first day
   for(let i=0; i<startWeekDay; i++) {
     const filler = document.createElement('div');
     filler.className = 'date-cell inactive';
     calendarEl.appendChild(filler);
   }
 
-  // Days of this month
-  for(let day=1; day <= daysInMonth; day++) {
+  for(let day=1; day<=daysInMonth; day++) {
     const date = new Date(year, month, day);
     const dateStr = formatDate(date);
     const cell = document.createElement('div');
     cell.className = 'date-cell';
     cell.textContent = day;
-    if (dateStr === formatDate(today)) cell.classList.add('today');
-    if (selectedDates.has(dateStr)) cell.classList.add('selected');
 
-    cell.onclick = () => {
-      // Only allow selecting dates from today forward
-      if (date < today) return;
-      if (selectedDates.has(dateStr)) {
-        selectedDates.delete(dateStr);
-        delete selectedTimesByDate[dateStr];
-      } else {
-        selectedDates.add(dateStr);
-        if (!selectedTimesByDate[dateStr]) selectedTimesByDate[dateStr] = [];
-      }
-      renderCalendar();
-      if (selectedDates.has(dateStr)) {
-        showTimeSlots(dateStr);
-      } else {
-        if (timeSlotsTitle.dataset.selectedDate === dateStr) {
-          hideTimeSlots();
+    if (dateStr === formatDate(today)) cell.classList.add('today');
+
+    // Disable dates before today
+    if (date < today) {
+      cell.classList.add('inactive');
+    } else {
+      // Highlight selected dates
+      if (selectedDates.has(dateStr)) cell.classList.add('selected');
+
+      cell.onclick = () => {
+        if (selectedDates.has(dateStr)) {
+          // Unselect date and remove times
+          selectedDates.delete(dateStr);
+          delete selectedTimesByDate[dateStr];
+          if (timeSlotsTitle.dataset.selectedDate === dateStr) {
+            hideTimeSlots();
+          }
+        } else {
+          selectedDates.add(dateStr);
+          if (!selectedTimesByDate[dateStr]) selectedTimesByDate[dateStr] = [];
+          // Show time slots for new selection
+          showTimeSlots(dateStr);
         }
-      }
-    };
+        renderCalendar();
+      };
+
+      // Clicking a selected date again opens time slots
+      cell.addEventListener('dblclick', () => {
+        if (selectedDates.has(dateStr)) {
+          showTimeSlots(dateStr);
+        }
+      });
+    }
+
     calendarEl.appendChild(cell);
   }
+
+  monthYearEl.textContent = new Date(year, month).toLocaleString('default', {month: 'long', year: 'numeric'});
 }
 
 function renderCalendar() {
@@ -268,6 +313,7 @@ function showTimeSlots(dateStr) {
     block.className = 'time-block';
     block.textContent = time;
     if (selectedTimes.includes(time)) block.classList.add('selected');
+
     block.onclick = () => {
       if (selectedTimes.includes(time)) {
         // Remove time
@@ -288,7 +334,30 @@ function hideTimeSlots() {
   timeSlotsTitle.dataset.selectedDate = '';
 }
 
-// Form submit event
+// Buttons to change months
+prevMonthBtn.onclick = () => {
+  if (currentMonth === 0) {
+    currentYear--;
+    currentMonth = 11;
+  } else {
+    currentMonth--;
+  }
+  renderCalendar();
+  hideTimeSlots();
+};
+
+nextMonthBtn.onclick = () => {
+  if (currentMonth === 11) {
+    currentYear++;
+    currentMonth = 0;
+  } else {
+    currentMonth++;
+  }
+  renderCalendar();
+  hideTimeSlots();
+};
+
+// Form submit handler
 document.getElementById('bookingForm').addEventListener('submit', e => {
   e.preventDefault();
 
@@ -297,7 +366,6 @@ document.getElementById('bookingForm').addEventListener('submit', e => {
     return;
   }
 
-  // Check at least one time slot selected per date
   for (const date of selectedDates) {
     if (!selectedTimesByDate[date] || selectedTimesByDate[date].length === 0) {
       alert(`Please select at least one time slot for ${displayDate(date)}.`);
@@ -305,14 +373,12 @@ document.getElementById('bookingForm').addEventListener('submit', e => {
     }
   }
 
-  // Collect form data
   const name = e.target.name.value.trim();
   const email = e.target.email.value.trim();
   const phone = e.target.phone.value.trim();
   const address = e.target.address.value.trim();
   const pets = e.target.pets.value.trim();
 
-  // Format dates and times
   const datesArr = Array.from(selectedDates).sort();
   const datesStr = datesArr.join(', ');
   let timesStr = '';
@@ -320,7 +386,6 @@ document.getElementById('bookingForm').addEventListener('submit', e => {
     timesStr += `${displayDate(date)}: ${selectedTimesByDate[date].join(', ')}\n`;
   });
 
-  // Build Google Form URL with your entry IDs
   const formURL = new URL("https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/viewform");
   formURL.searchParams.set("entry.2005620554", name);
   formURL.searchParams.set("entry.1045781291", email);
@@ -330,7 +395,6 @@ document.getElementById('bookingForm').addEventListener('submit', e => {
   formURL.searchParams.set("entry.1726420148", timesStr);
   formURL.searchParams.set("entry.2080923976", pets);
 
-  // Redirect to Google Form with prefilled data
   window.location.href = formURL.toString();
 });
 
@@ -338,5 +402,6 @@ document.getElementById('bookingForm').addEventListener('submit', e => {
 renderCalendar();
 
 </script>
+
 </body>
 </html>
