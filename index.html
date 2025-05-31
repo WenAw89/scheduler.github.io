@@ -155,6 +155,7 @@
         day.onclick = () => {
           if (selectedDates.has(fullDate)) {
             selectedDates.delete(fullDate);
+            delete selectedTimes[fullDate];
             day.classList.remove('selected');
           } else {
             selectedDates.add(fullDate);
