@@ -1,47 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pick Time Slots per Date</title>
-  <style>
-    body { font-family: Arial; max-width: 600px; margin: 2rem auto; padding: 1rem; background: #f5f5f5; }
-    h2 { text-align: center; }
-    .date-section { background: white; padding: 1rem; margin-bottom: 1.5rem; border-radius: 6px; box-shadow: 0 0 6px #ccc; }
-    .date-title { font-weight: bold; margin-bottom: 0.5rem; }
-    .time-blocks { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    .time-block {
-      padding: 0.4rem 0.8rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      background: white;
-      cursor: pointer;
-      user-select: none;
-    }
-    .time-block.selected {
-      background-color: #007aff;
-      color: white;
-      font-weight: bold;
-    }
-    button {
-      width: 100%;
-      padding: 0.75rem;
-      font-size: 1.1rem;
-      background: #007aff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Multi-date & Time Slot Booking</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #f5f5f5;
+  }
+  h1 {
+    text-align: center;
+  }
+  #calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    user-select: none;
+  }
+  .day-name, .date-cell {
+    text-align: center;
+    padding: 6px 0;
+  }
+  .day-name {
+    font-weight: bold;
+    background: #007aff;
+    color: white;
+    border-radius: 4px;
+  }
+  .date-cell {
+    cursor: pointer;
+    border-radius: 6px;
+    background: #e0e0e0;
+    color: #333;
+  }
+  .date-cell.today {
+    border: 2px solid #007aff;
+  }
+  .date-cell.selected {
+    background: #007aff;
+    color: white;
+    font-weight: bold;
+  }
+  .date-cell.inactive {
+    color: #bbb;
+    cursor: default;
+    background: transparent;
+  }
+
+  #timeSlotsContainer {
+    margin-top: 20px;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 0 8px #ccc;
+  }
+  #timeSlotsTitle {
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .time-blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  .time-block {
+    padding: 0.5rem 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    background: white;
+    color: #333;
+  }
+  .time-block.selected {
+    background-color: #007aff;
+    color: white;
+    font-weight: bold;
+  }
+
+  #submitBtn {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1.1rem;
+    background-color: #007aff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: bold;
+  }
+  input, textarea {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-top: 0.3rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  textarea {
+    resize: vertical;
+  }
+</style>
 </head>
 <body>
-  <h2>Select Time Blocks for Each Date</h2>
-  <div id="dateTimeContainer"></div>
-  <button id="submitBtn">Submit Booking</button>
+
+<h1>Select Dates and Times</h1>
+
+<div id="calendar"></div>
+
+<div id="timeSlotsContainer" style="display:none;">
+  <div id="timeSlotsTitle"></div>
+  <div class="time-blocks" id="timeBlocks"></div>
+</div>
+
+<form id="bookingForm" style="margin-top: 2rem;">
+  <label for="name">Full Name *</label>
+  <input id="name" type="text" required />
+
+  <label for="email">Email *</label>
+  <input id="email" type="email" required />
+
+  <label for="phone">Phone Number *</label>
+  <input id="phone" type="tel" required />
+
+  <label for="address">Address *</label>
+  <input id="address" type="text" required />
+
+  <label for="pets">Tell me about your pets</label>
+  <textarea id="pets" rows="4" placeholder="Name, type, routine, behavior..."></textarea>
+
+  <button type="submit" id="submitBtn">Submit Booking</button>
+</form>
 
 <script>
-const timeSlots = () => {
+// Constants
+const calendarEl = document.getElementById('calendar');
+const timeSlotsContainer = document.getElementById('timeSlotsContainer');
+const timeSlotsTitle = document.getElementById('timeSlotsTitle');
+const timeBlocksEl = document.getElementById('timeBlocks');
+
+const today = new Date();
+let currentYear = today.getFullYear();
+let currentMonth = today.getMonth(); // 0-indexed
+const selectedDates = new Set(); // store yyyy-mm-dd string dates
+const selectedTimesByDate = {};  // { "yyyy-mm-dd": [ "7:30 AM", ... ] }
+
+// Generate day names
+const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+dayNames.forEach(day => {
+  const dayEl = document.createElement('div');
+  dayEl.className = 'day-name';
+  dayEl.textContent = day;
+  calendarEl.appendChild(dayEl);
+});
+
+// Helper: format date to yyyy-mm-dd string
+function formatDate(date) {
+  const y = date.getFullYear();
+  const m = (date.getMonth() + 1).toString().padStart(2,'0');
+  const d = date.getDate().toString().padStart(2,'0');
+  return `${y}-${m}-${d}`;
+}
+
+// Helper: display date nicely for user
+function displayDate(dateStr) {
+  const date = new Date(dateStr);
+  return date.toDateString();
+}
+
+// Generate calendar days for current month + some padding
+function generateCalendar(year, month) {
+  calendarEl.querySelectorAll('.date-cell').forEach(el => el.remove());
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startWeekDay = firstDay.getDay(); // Sun=0
+
+  // Previous month filler days
+  for(let i=0; i<startWeekDay; i++) {
+    const filler = document.createElement('div');
+    filler.className = 'date-cell inactive';
+    calendarEl.appendChild(filler);
+  }
+
+  // Days of this month
+  for(let day=1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day);
+    const dateStr = formatDate(date);
+    const cell = document.createElement('div');
+    cell.className = 'date-cell';
+    cell.textContent = day;
+    if (dateStr === formatDate(today)) cell.classList.add('today');
+    if (selectedDates.has(dateStr)) cell.classList.add('selected');
+
+    cell.onclick = () => {
+      // Only allow selecting dates from today forward
+      if (date < today) return;
+      if (selectedDates.has(dateStr)) {
+        selectedDates.delete(dateStr);
+        delete selectedTimesByDate[dateStr];
+      } else {
+        selectedDates.add(dateStr);
+        if (!selectedTimesByDate[dateStr]) selectedTimesByDate[dateStr] = [];
+      }
+      renderCalendar();
+      if (selectedDates.has(dateStr)) {
+        showTimeSlots(dateStr);
+      } else {
+        if (timeSlotsTitle.dataset.selectedDate === dateStr) {
+          hideTimeSlots();
+        }
+      }
+    };
+    calendarEl.appendChild(cell);
+  }
+}
+
+function renderCalendar() {
+  generateCalendar(currentYear, currentMonth);
+}
+
+function timeSlots() {
   const slots = [];
   let hour = 7, minute = 30;
   while (hour < 20 || (hour === 20 && minute === 0)) {
@@ -55,75 +251,92 @@ const timeSlots = () => {
     }
   }
   return slots;
-};
-
-const selectedDates = JSON.parse(localStorage.getItem('selectedDates') || '[]');
-if (selectedDates.length === 0) {
-  alert('Please select dates first.');
-  window.location.href = 'index.html';
 }
 
-const dateTimeSelections = {};
-const container = document.getElementById('dateTimeContainer');
-const slots = timeSlots();
+// Show time slots for a specific date
+function showTimeSlots(dateStr) {
+  timeSlotsContainer.style.display = 'block';
+  timeSlotsTitle.textContent = `Select Time Slots for ${displayDate(dateStr)}`;
+  timeSlotsTitle.dataset.selectedDate = dateStr;
 
-selectedDates.forEach(date => {
-  const section = document.createElement('div');
-  section.className = 'date-section';
-
-  const title = document.createElement('div');
-  title.className = 'date-title';
-  title.textContent = date;
-
-  const blocksDiv = document.createElement('div');
-  blocksDiv.className = 'time-blocks';
-
-  dateTimeSelections[date] = [];
+  timeBlocksEl.innerHTML = '';
+  const slots = timeSlots();
+  const selectedTimes = selectedTimesByDate[dateStr] || [];
 
   slots.forEach(time => {
     const block = document.createElement('div');
     block.className = 'time-block';
     block.textContent = time;
+    if (selectedTimes.includes(time)) block.classList.add('selected');
     block.onclick = () => {
-      block.classList.toggle('selected');
-      if (dateTimeSelections[date].includes(time)) {
-        dateTimeSelections[date] = dateTimeSelections[date].filter(t => t !== time);
+      if (selectedTimes.includes(time)) {
+        // Remove time
+        selectedTimesByDate[dateStr] = selectedTimesByDate[dateStr].filter(t => t !== time);
+        block.classList.remove('selected');
       } else {
-        dateTimeSelections[date].push(time);
+        selectedTimesByDate[dateStr].push(time);
+        block.classList.add('selected');
       }
     };
-    blocksDiv.appendChild(block);
+    timeBlocksEl.appendChild(block);
+  });
+}
+
+function hideTimeSlots() {
+  timeSlotsContainer.style.display = 'none';
+  timeSlotsTitle.textContent = '';
+  timeSlotsTitle.dataset.selectedDate = '';
+}
+
+// Form submit event
+document.getElementById('bookingForm').addEventListener('submit', e => {
+  e.preventDefault();
+
+  if (selectedDates.size === 0) {
+    alert('Please select at least one date.');
+    return;
+  }
+
+  // Check at least one time slot selected per date
+  for (const date of selectedDates) {
+    if (!selectedTimesByDate[date] || selectedTimesByDate[date].length === 0) {
+      alert(`Please select at least one time slot for ${displayDate(date)}.`);
+      return;
+    }
+  }
+
+  // Collect form data
+  const name = e.target.name.value.trim();
+  const email = e.target.email.value.trim();
+  const phone = e.target.phone.value.trim();
+  const address = e.target.address.value.trim();
+  const pets = e.target.pets.value.trim();
+
+  // Format dates and times
+  const datesArr = Array.from(selectedDates).sort();
+  const datesStr = datesArr.join(', ');
+  let timesStr = '';
+  datesArr.forEach(date => {
+    timesStr += `${displayDate(date)}: ${selectedTimesByDate[date].join(', ')}\n`;
   });
 
-  section.appendChild(title);
-  section.appendChild(blocksDiv);
-  container.appendChild(section);
-});
-
-document.getElementById('submitBtn').onclick = () => {
-  const name = prompt("Enter your full name:");
-  const email = prompt("Enter your email:");
-  const phone = prompt("Enter your phone number:");
-  const address = prompt("Enter your address:");
-  const pets = prompt("Tell me about your pets:");
-
-  const formattedSelections = selectedDates.map(date => {
-    const times = dateTimeSelections[date].join(', ');
-    return `${date}: ${times}`;
-  }).join('\n');
-
+  // Build Google Form URL with your entry IDs
   const formURL = new URL("https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/viewform");
   formURL.searchParams.set("entry.2005620554", name);
   formURL.searchParams.set("entry.1045781291", email);
-  formURL.searchParams.set("entry.1065046570", address);
   formURL.searchParams.set("entry.1166974658", phone);
-  formURL.searchParams.set("entry.839337160", selectedDates.join(', '));
-  formURL.searchParams.set("entry.1726420148", formattedSelections);
+  formURL.searchParams.set("entry.1065046570", address);
+  formURL.searchParams.set("entry.839337160", datesStr);
+  formURL.searchParams.set("entry.1726420148", timesStr);
   formURL.searchParams.set("entry.2080923976", pets);
 
-  // Redirect to Google Form with prefilled info
+  // Redirect to Google Form with prefilled data
   window.location.href = formURL.toString();
-};
+});
+
+// Initial render
+renderCalendar();
+
 </script>
 </body>
 </html>
