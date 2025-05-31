@@ -3,405 +3,328 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Multi-month Calendar with Time Slot Booking</title>
+<title>Calendar with Date & Time Slot Selection</title>
 <style>
   body {
     font-family: Arial, sans-serif;
-    max-width: 700px;
+    max-width: 480px;
     margin: 2rem auto;
-    padding: 1rem;
-    background: #f5f5f5;
+    padding: 0 1rem;
+    background: #f9f9f9;
+    color: #333;
   }
   h1 {
     text-align: center;
+    margin-bottom: 1rem;
   }
-  #calendarHeader {
+  .calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
   }
-  #calendarHeader button {
+  .calendar-header button {
     background: #007aff;
-    color: white;
     border: none;
-    padding: 6px 12px;
+    color: white;
+    padding: 0.4rem 1rem;
+    font-size: 1rem;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 1rem;
   }
-  #calendarHeader h2 {
-    margin: 0;
-    font-weight: 700;
+  .calendar-header span {
+    font-weight: bold;
+    font-size: 1.2rem;
   }
-  #calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    background: white;
-    padding: 10px;
-    border-radius: 8px;
+  table.calendar {
+    width: 100%;
+    border-collapse: collapse;
     user-select: none;
   }
-  .day-name, .date-cell {
+  table.calendar th {
+    padding: 0.5rem 0;
+    font-weight: bold;
+    border-bottom: 2px solid #ccc;
+  }
+  table.calendar td {
+    width: 14.28%;
+    height: 50px;
     text-align: center;
-    padding: 8px 0;
-  }
-  .day-name {
-    font-weight: bold;
-    background: #007aff;
-    color: white;
-    border-radius: 4px;
-  }
-  .date-cell {
+    vertical-align: middle;
     cursor: pointer;
+    border: 1px solid transparent;
     border-radius: 6px;
-    background: #e0e0e0;
-    color: #333;
-    transition: background-color 0.3s;
   }
-  .date-cell.today {
-    border: 2px solid #007aff;
+  table.calendar td:hover:not(.disabled) {
+    background-color: #e0f0ff;
   }
-  .date-cell.selected {
-    background: #007aff;
+  table.calendar td.disabled {
+    color: #aaa;
+    cursor: default;
+  }
+  table.calendar td.selected {
+    background-color: #007aff;
     color: white;
     font-weight: bold;
-  }
-  .date-cell.inactive {
-    color: #bbb;
-    cursor: default;
-    background: transparent;
   }
 
-  #timeSlotsContainer {
-    margin-top: 20px;
+  /* Time slot styles */
+  #timeSlotsPanel {
+    margin-top: 1rem;
     background: white;
     padding: 1rem;
     border-radius: 8px;
-    box-shadow: 0 0 8px #ccc;
+    box-shadow: 0 0 7px #ccc;
+    display: none;
   }
   #timeSlotsTitle {
     font-weight: bold;
-    margin-bottom: 10px;
-    text-align: center;
+    margin-bottom: 0.75rem;
   }
   .time-blocks {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    justify-content: center;
   }
   .time-block {
-    padding: 0.5rem 0.9rem;
+    padding: 0.5rem 1rem;
+    background: white;
     border: 1px solid #ccc;
     border-radius: 6px;
     cursor: pointer;
     user-select: none;
-    background: white;
-    color: #333;
-    transition: background-color 0.2s;
   }
   .time-block.selected {
-    background-color: #007aff;
+    background: #007aff;
     color: white;
+    border-color: #005fcc;
     font-weight: bold;
   }
 
-  #submitBtn {
+  /* Selected summary */
+  #summary {
     margin-top: 1.5rem;
-    width: 100%;
-    padding: 0.8rem;
-    font-size: 1.1rem;
-    background-color: #007aff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 0 7px #ccc;
+    font-size: 0.95rem;
   }
-
-  label {
+  #summary strong {
     display: block;
-    margin-top: 1rem;
-    font-weight: bold;
-  }
-  input, textarea {
-    width: 100%;
-    padding: 0.5rem;
-    font-size: 1rem;
-    margin-top: 0.3rem;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
-  textarea {
-    resize: vertical;
+    margin-top: 0.8rem;
+    margin-bottom: 0.2rem;
   }
 </style>
 </head>
 <body>
 
-<h1>Select Dates and Times</h1>
+<h1>Booking Calendar</h1>
 
-<div id="calendarHeader">
-  <button id="prevMonthBtn">&lt; Prev</button>
-  <h2 id="monthYear"></h2>
-  <button id="nextMonthBtn">Next &gt;</button>
+<div class="calendar-header">
+  <button id="prevMonth">&lt; Prev</button>
+  <span id="monthYear"></span>
+  <button id="nextMonth">Next &gt;</button>
 </div>
 
-<div id="calendar"></div>
+<table class="calendar" id="calendar">
+  <thead>
+    <tr>
+      <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+    </tr>
+  </thead>
+  <tbody id="calendarBody">
+    <!-- Calendar dates go here -->
+  </tbody>
+</table>
 
-<div id="timeSlotsContainer" style="display:none;">
-  <div id="timeSlotsTitle"></div>
+<div id="timeSlotsPanel">
+  <div id="timeSlotsTitle" data-selected-date="">Select Time Slots for <span id="selectedDateText"></span></div>
   <div class="time-blocks" id="timeBlocks"></div>
 </div>
 
-<form id="bookingForm" style="margin-top: 2rem;">
-  <label for="name">Full Name *</label>
-  <input id="name" type="text" required />
-
-  <label for="email">Email *</label>
-  <input id="email" type="email" required />
-
-  <label for="phone">Phone Number *</label>
-  <input id="phone" type="tel" required />
-
-  <label for="address">Address *</label>
-  <input id="address" type="text" required />
-
-  <label for="pets">Tell me about your pets</label>
-  <textarea id="pets" rows="4" placeholder="Name, type, routine, behavior..."></textarea>
-
-  <button type="submit" id="submitBtn">Submit Booking</button>
-</form>
+<div id="summary">
+  <strong>Selected Dates & Times:</strong>
+  <div id="summaryContent">None selected yet.</div>
+</div>
 
 <script>
-// Variables and elements
-const calendarEl = document.getElementById('calendar');
-const monthYearEl = document.getElementById('monthYear');
-const prevMonthBtn = document.getElementById('prevMonthBtn');
-const nextMonthBtn = document.getElementById('nextMonthBtn');
-const timeSlotsContainer = document.getElementById('timeSlotsContainer');
-const timeSlotsTitle = document.getElementById('timeSlotsTitle');
-const timeBlocksEl = document.getElementById('timeBlocks');
+  const calendarBody = document.getElementById('calendarBody');
+  const monthYearLabel = document.getElementById('monthYear');
+  const prevMonthBtn = document.getElementById('prevMonth');
+  const nextMonthBtn = document.getElementById('nextMonth');
 
-const today = new Date();
-let currentYear = today.getFullYear();
-let currentMonth = today.getMonth();
+  const timeSlotsPanel = document.getElementById('timeSlotsPanel');
+  const timeSlotsTitle = document.getElementById('timeSlotsTitle');
+  const selectedDateText = document.getElementById('selectedDateText');
+  const timeBlocksContainer = document.getElementById('timeBlocks');
 
-const selectedDates = new Set();
-const selectedTimesByDate = {};
+  const summaryContent = document.getElementById('summaryContent');
 
-// Day names for calendar header
-const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  let currentYear, currentMonth;
 
-// Helpers
-function formatDate(date) {
-  const y = date.getFullYear();
-  const m = (date.getMonth() + 1).toString().padStart(2,'0');
-  const d = date.getDate().toString().padStart(2,'0');
-  return `${y}-${m}-${d}`;
-}
+  // Selected dates stored as YYYY-MM-DD strings in a Set
+  let selectedDates = new Set();
+  // Map each date string to an array of selected time blocks
+  let selectedTimesByDate = {};
 
-function displayDate(dateStr) {
-  const date = new Date(dateStr);
-  return date.toDateString();
-}
+  // Initialize currentYear and currentMonth to today
+  const today = new Date();
+  currentYear = today.getFullYear();
+  currentMonth = today.getMonth();
 
-// Render calendar grid
-function generateCalendar(year, month) {
-  calendarEl.innerHTML = '';
-  // Show day names
-  dayNames.forEach(day => {
-    const dayEl = document.createElement('div');
-    dayEl.className = 'day-name';
-    dayEl.textContent = day;
-    calendarEl.appendChild(dayEl);
-  });
-
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const daysInMonth = lastDay.getDate();
-  const startWeekDay = firstDay.getDay();
-
-  // Fill empty cells before first day
-  for(let i=0; i<startWeekDay; i++) {
-    const filler = document.createElement('div');
-    filler.className = 'date-cell inactive';
-    calendarEl.appendChild(filler);
+  // Generate time blocks (7:30 AM to 8:00 PM, 30 min intervals)
+  function generateTimeBlocks() {
+    const blocks = [];
+    let hour = 7, minute = 30;
+    while (hour < 20 || (hour === 20 && minute === 0)) {
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      let displayHour = hour % 12 || 12;
+      blocks.push(`${displayHour}:${minute.toString().padStart(2, '0')} ${ampm}`);
+      minute += 30;
+      if (minute === 60) {
+        minute = 0;
+        hour++;
+      }
+    }
+    return blocks;
   }
 
-  for(let day=1; day<=daysInMonth; day++) {
-    const date = new Date(year, month, day);
-    const dateStr = formatDate(date);
-    const cell = document.createElement('div');
-    cell.className = 'date-cell';
-    cell.textContent = day;
+  // Render calendar grid for currentYear and currentMonth
+  function renderCalendar() {
+    calendarBody.innerHTML = '';
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    const startWeekDay = firstDay.getDay();
+    const daysInMonth = lastDay.getDate();
 
-    if (dateStr === formatDate(today)) cell.classList.add('today');
+    monthYearLabel.textContent = firstDay.toLocaleString('default', { year: 'numeric', month: 'long' });
 
-    // Disable dates before today
-    if (date < today) {
-      cell.classList.add('inactive');
-    } else {
-      // Highlight selected dates
-      if (selectedDates.has(dateStr)) cell.classList.add('selected');
+    // Calculate total rows needed (max 6 weeks)
+    let totalCells = startWeekDay + daysInMonth;
+    let rows = Math.ceil(totalCells / 7);
 
-      cell.onclick = () => {
-        if (selectedDates.has(dateStr)) {
-          // Unselect date and remove times
-          selectedDates.delete(dateStr);
-          delete selectedTimesByDate[dateStr];
-          if (timeSlotsTitle.dataset.selectedDate === dateStr) {
-            hideTimeSlots();
+    let dayCounter = 1;
+    for (let r = 0; r < rows; r++) {
+      const row = document.createElement('tr');
+      for (let c = 0; c < 7; c++) {
+        const cell = document.createElement('td');
+
+        // Calculate the date for this cell
+        const cellIndex = r * 7 + c;
+        if (cellIndex >= startWeekDay && dayCounter <= daysInMonth) {
+          const dateStr = formatDate(currentYear, currentMonth + 1, dayCounter);
+
+          cell.textContent = dayCounter;
+
+          // Disable past dates
+          if (isPastDate(currentYear, currentMonth, dayCounter)) {
+            cell.classList.add('disabled');
+          } else {
+            cell.classList.add('clickable');
+            // Highlight if selected
+            if (selectedDates.has(dateStr)) {
+              cell.classList.add('selected');
+            }
+            // Click handler to toggle select and show time slots
+            cell.onclick = () => {
+              if (selectedDates.has(dateStr)) {
+                // Unselect date and remove times
+                selectedDates.delete(dateStr);
+                delete selectedTimesByDate[dateStr];
+                if (timeSlotsTitle.dataset.selectedDate === dateStr) {
+                  hideTimeSlots();
+                }
+              } else {
+                // Select date and init time slots array if needed
+                selectedDates.add(dateStr);
+                if (!selectedTimesByDate[dateStr]) selectedTimesByDate[dateStr] = [];
+                showTimeSlots(dateStr);
+              }
+              renderCalendar();
+
+              // Hide time slots panel if no selected dates
+              if (selectedDates.size === 0) {
+                hideTimeSlots();
+              }
+            };
           }
-        } else {
-          selectedDates.add(dateStr);
-          if (!selectedTimesByDate[dateStr]) selectedTimesByDate[dateStr] = [];
-          // Show time slots for new selection
-          showTimeSlots(dateStr);
+          dayCounter++;
         }
-        renderCalendar();
-      };
-
-      // Clicking a selected date again opens time slots
-      cell.addEventListener('dblclick', () => {
-        if (selectedDates.has(dateStr)) {
-          showTimeSlots(dateStr);
-        }
-      });
-    }
-
-    calendarEl.appendChild(cell);
-  }
-
-  monthYearEl.textContent = new Date(year, month).toLocaleString('default', {month: 'long', year: 'numeric'});
-}
-
-function renderCalendar() {
-  generateCalendar(currentYear, currentMonth);
-}
-
-function timeSlots() {
-  const slots = [];
-  let hour = 7, minute = 30;
-  while (hour < 20 || (hour === 20 && minute === 0)) {
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    slots.push(`${displayHour}:${minute.toString().padStart(2,'0')} ${ampm}`);
-    minute += 30;
-    if (minute === 60) {
-      minute = 0;
-      hour++;
+        row.appendChild(cell);
+      }
+      calendarBody.appendChild(row);
     }
   }
-  return slots;
-}
 
-// Show time slots for a specific date
-function showTimeSlots(dateStr) {
-  timeSlotsContainer.style.display = 'block';
-  timeSlotsTitle.textContent = `Select Time Slots for ${displayDate(dateStr)}`;
-  timeSlotsTitle.dataset.selectedDate = dateStr;
+  // Format date YYYY-MM-DD with leading zeros
+  function formatDate(year, month, day) {
+    return `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  }
 
-  timeBlocksEl.innerHTML = '';
-  const slots = timeSlots();
-  const selectedTimes = selectedTimesByDate[dateStr] || [];
+  // Check if date is in the past (compared to today)
+  function isPastDate(year, month, day) {
+    const d = new Date(year, month, day, 23, 59, 59);
+    return d < new Date();
+  }
 
-  slots.forEach(time => {
-    const block = document.createElement('div');
-    block.className = 'time-block';
-    block.textContent = time;
-    if (selectedTimes.includes(time)) block.classList.add('selected');
+  // Show time slots for given date string
+  function showTimeSlots(dateStr) {
+    timeSlotsPanel.style.display = 'block';
+    timeSlotsTitle.dataset.selectedDate = dateStr;
+    selectedDateText.textContent = dateStr;
 
-    block.onclick = () => {
+    renderTimeBlocks(dateStr);
+  }
+
+  // Hide time slots panel
+  function hideTimeSlots() {
+    timeSlotsPanel.style.display = 'none';
+    timeSlotsTitle.dataset.selectedDate = '';
+    selectedDateText.textContent = '';
+    timeBlocksContainer.innerHTML = '';
+  }
+
+  // Render time blocks for a selected date
+  function renderTimeBlocks(dateStr) {
+    timeBlocksContainer.innerHTML = '';
+    const timeBlocks = generateTimeBlocks();
+    const selectedTimes = selectedTimesByDate[dateStr] || [];
+
+    timeBlocks.forEach(time => {
+      const block = document.createElement('div');
+      block.classList.add('time-block');
+      block.textContent = time;
+
       if (selectedTimes.includes(time)) {
-        // Remove time
-        selectedTimesByDate[dateStr] = selectedTimesByDate[dateStr].filter(t => t !== time);
-        block.classList.remove('selected');
-      } else {
-        selectedTimesByDate[dateStr].push(time);
         block.classList.add('selected');
       }
-    };
-    timeBlocksEl.appendChild(block);
-  });
-}
 
-function hideTimeSlots() {
-  timeSlotsContainer.style.display = 'none';
-  timeSlotsTitle.textContent = '';
-  timeSlotsTitle.dataset.selectedDate = '';
-}
+      block.onclick = () => {
+        if (selectedTimes.includes(time)) {
+          // Remove time
+          selectedTimesByDate[dateStr] = selectedTimes.filter(t => t !== time);
+        } else {
+          // Add time
+          selectedTimesByDate[dateStr].push(time);
+          // Keep times sorted (optional)
+          selectedTimesByDate[dateStr].sort((a,b) => {
+            return timeToMinutes(a) - timeToMinutes(b);
+          });
+        }
+        renderTimeBlocks(dateStr);
+        updateSummary();
+      };
 
-// Buttons to change months
-prevMonthBtn.onclick = () => {
-  if (currentMonth === 0) {
-    currentYear--;
-    currentMonth = 11;
-  } else {
-    currentMonth--;
-  }
-  renderCalendar();
-  hideTimeSlots();
-};
+      timeBlocksContainer.appendChild(block);
+    });
 
-nextMonthBtn.onclick = () => {
-  if (currentMonth === 11) {
-    currentYear++;
-    currentMonth = 0;
-  } else {
-    currentMonth++;
-  }
-  renderCalendar();
-  hideTimeSlots();
-};
-
-// Form submit handler
-document.getElementById('bookingForm').addEventListener('submit', e => {
-  e.preventDefault();
-
-  if (selectedDates.size === 0) {
-    alert('Please select at least one date.');
-    return;
+    updateSummary();
   }
 
-  for (const date of selectedDates) {
-    if (!selectedTimesByDate[date] || selectedTimesByDate[date].length === 0) {
-      alert(`Please select at least one time slot for ${displayDate(date)}.`);
-      return;
-    }
-  }
-
-  const name = e.target.name.value.trim();
-  const email = e.target.email.value.trim();
-  const phone = e.target.phone.value.trim();
-  const address = e.target.address.value.trim();
-  const pets = e.target.pets.value.trim();
-
-  const datesArr = Array.from(selectedDates).sort();
-  const datesStr = datesArr.join(', ');
-  let timesStr = '';
-  datesArr.forEach(date => {
-    timesStr += `${displayDate(date)}: ${selectedTimesByDate[date].join(', ')}\n`;
-  });
-
-  const formURL = new URL("https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/viewform");
-  formURL.searchParams.set("entry.2005620554", name);
-  formURL.searchParams.set("entry.1045781291", email);
-  formURL.searchParams.set("entry.1166974658", phone);
-  formURL.searchParams.set("entry.1065046570", address);
-  formURL.searchParams.set("entry.839337160", datesStr);
-  formURL.searchParams.set("entry.1726420148", timesStr);
-  formURL.searchParams.set("entry.2080923976", pets);
-
-  window.location.href = formURL.toString();
-});
-
-// Initial render
-renderCalendar();
-
-</script>
-
-</body>
-</html>
+  // Convert time string "H:MM AM/PM" to minutes for sorting
+  function timeToMinutes(t) {
+    let [time, ampm] = t.split(' ');
+    let [hour, minute] = time.split(':').map(Number);
+    if (ampm === 'PM' && hour !== 12) hour += 12;
+    if (amp
