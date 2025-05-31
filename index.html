@@ -175,21 +175,7 @@
       });
     }
 
-    function redirectToGoogleForm() {
-      const selectedDates = Array.from(document.querySelectorAll('.day.selected')).map(el => el.dataset.date);
-      const selectedTimes = Array.from(document.querySelectorAll('.time-block.selected')).map(el => el.dataset.time);
 
-      // Replace with your actual form URL
-      const formBaseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/viewform";
-      const params = new URLSearchParams();
-
-      // Replace these entry IDs with your actual Google Form entry IDs
-      params.set("entry.1514384530", selectedDates.join(', ')); // Dates
-      params.set("entry.1883409824", selectedTimes.join(', ')); // Time blocks
-
-      const finalUrl = `${formBaseUrl}?${params.toString()}`;
-      window.location.href = finalUrl;
-    }
 
     renderCalendar(currentDate);
     renderTimeBlocks();
