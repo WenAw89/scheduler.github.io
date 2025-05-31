@@ -3,193 +3,189 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Select Time Blocks & Booking Form</title>
+<title>Select Time Blocks & Enter Info</title>
 <style>
   body {
     font-family: Arial, sans-serif;
     max-width: 480px;
     margin: 2rem auto;
     padding: 0 1rem;
-    background: #f9f9f9;
-    color: #333;
   }
   h1 {
     text-align: center;
-    margin-bottom: 1rem;
   }
   .time-blocks {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
     justify-content: center;
+    margin-bottom: 1rem;
   }
   .time-block {
     padding: 0.5rem 1rem;
-    background: white;
     border: 1px solid #ccc;
     border-radius: 6px;
     cursor: pointer;
     user-select: none;
   }
   .time-block.selected {
-    background: #007aff;
+    background-color: #007aff;
     color: white;
-    border-color: #005fcc;
+    font-weight: bold;
   }
   form {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 0 7px #ccc;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 1rem;
   }
   label {
-    display: block;
-    margin: 0.6rem 0 0.3rem;
     font-weight: bold;
   }
   input, textarea {
-    width: 100%;
-    padding: 0.4rem;
+    padding: 0.5rem;
     font-size: 1rem;
-    border: 1px solid #ccc;
     border-radius: 4px;
+    border: 1px solid #ccc;
   }
   textarea {
     resize: vertical;
   }
   button.submit-btn {
-    margin-top: 1rem;
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1.1rem;
-    background: #007aff;
+    background-color: #007aff;
     color: white;
     border: none;
+    padding: 0.75rem;
     border-radius: 6px;
+    font-size: 1.1rem;
     cursor: pointer;
-  }
-  button.submit-btn:disabled {
-    background: #99caff;
-    cursor: default;
+    margin-top: 1rem;
   }
 </style>
 </head>
 <body>
+  <h1>Select Time Blocks & Enter Info</h1>
 
-<h1>Select Time Blocks</h1>
-<div class="time-blocks" id="timeBlocks"></div>
+  <div class="time-blocks" id="timeBlocks"></div>
 
-<h1>Booking Information</h1>
-<form id="bookingForm">
-  <label for="name">Full Name *</label>
-  <input type="text" id="name" name="name" required />
+  <form id="bookingForm">
+    <label for="name">Full Name *</label>
+    <input id="name" type="text" required />
 
-  <label for="email">Email *</label>
-  <input type="email" id="email" name="email" required />
+    <label for="email">Email *</label>
+    <input id="email" type="email" required />
 
-  <label for="phone">Phone Number *</label>
-  <input type="tel" id="phone" name="phone" required />
+    <label for="phone">Phone Number *</label>
+    <input id="phone" type="tel" required />
 
-  <label for="address">Address *</label>
-  <textarea id="address" name="address" rows="2" required></textarea>
+    <label for="address">Address *</label>
+    <input id="address" type="text" required />
 
-  <label for="dates">Selected Dates *</label>
-  <textarea id="dates" name="dates" rows="2" readonly required></textarea>
+    <label for="pets">Tell me about your pets</label>
+    <textarea id="pets" rows="4" placeholder="Name, type, routine, behavior..."></textarea>
 
-  <label for="times">Selected Time Blocks *</label>
-  <textarea id="times" name="times" rows="2" readonly required></textarea>
+    <label>Selected Dates</label>
+    <textarea id="selectedDates" rows="2" readonly></textarea>
 
-  <label for="pets">Tell me about your pets *</label>
-  <textarea id="pets" name="pets" rows="3" required></textarea>
+    <label>Selected Time Blocks</label>
+    <textarea id="selectedTimes" rows="2" readonly></textarea>
 
-  <button type="submit" class="submit-btn" disabled>Submit Booking</button>
-</form>
+    <button type="submit" class="submit-btn">Submit Booking</button>
+  </form>
 
 <script>
   const timeBlocksContainer = document.getElementById('timeBlocks');
   const bookingForm = document.getElementById('bookingForm');
-  const submitBtn = bookingForm.querySelector('button.submit-btn');
-  const datesTextarea = document.getElementById('dates');
-  const timesTextarea = document.getElementById('times');
+  const selectedDatesText = document.getElementById('selectedDates');
+  const selectedTimesText = document.getElementById('selectedTimes');
 
-  // Load selected dates from localStorage
-  let selectedDates = JSON.parse(localStorage.getItem('selectedDates') || "[]");
-  if (selectedDates.length === 0) {
-    alert('No dates selected. Redirecting to date selection.');
-    window.location.href = 'index.html';
-  }
-
-  // Prefill dates textarea
-  datesTextarea.value = selectedDates.join(', ');
-
-  // Generate 30-minute time blocks from 7:30am to 8:00pm
+  // Time blocks from 7:30 AM to 8:00 PM every 30 minutes
   function generateTimeBlocks() {
-    const times = [];
-    let hour = 7;
-    let minute = 30;
-    while(hour < 20 || (hour === 20 && minute === 0)) {
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      let displayHour = hour % 12 || 12;
-      const timeStr = `${displayHour}:${minute.toString().padStart(2,'0')} ${ampm}`;
-      times.push(timeStr);
+    const blocks = [];
+    let hour = 7, minute = 30;
+    while (hour < 20 || (hour === 20 && minute === 0)) {
+      blocks.push(`${hour.toString().padStart(2,'0')}:${minute.toString().padStart(2,'0')}`);
       minute += 30;
-      if(minute === 60) {
+      if (minute === 60) {
         minute = 0;
         hour++;
       }
     }
-    return times;
+    return blocks;
   }
 
+  let selectedTimes = new Set();
+
   function renderTimeBlocks() {
-    const times = generateTimeBlocks();
-    times.forEach(time => {
+    const blocks = generateTimeBlocks();
+    blocks.forEach(time => {
       const block = document.createElement('div');
-      block.className = 'time-block';
+      block.classList.add('time-block');
       block.textContent = time;
-      block.dataset.time = time;
-      block.addEventListener('click', () => {
-        block.classList.toggle('selected');
+      block.onclick = () => {
+        if (selectedTimes.has(time)) {
+          selectedTimes.delete(time);
+          block.classList.remove('selected');
+        } else {
+          selectedTimes.add(time);
+          block.classList.add('selected');
+        }
         updateSelectedTimes();
-        validateForm();
-      });
+      };
       timeBlocksContainer.appendChild(block);
     });
   }
 
-  let selectedTimes = [];
-
   function updateSelectedTimes() {
-    selectedTimes = Array.from(document.querySelectorAll('.time-block.selected')).map(el => el.dataset.time);
-    timesTextarea.value = selectedTimes.join(', ');
+    selectedTimesText.value = Array.from(selectedTimes).join(', ');
   }
 
-  function validateForm() {
-    // Enable submit button only if required fields filled and at least one time selected
-    const isValid = bookingForm.name.value.trim() &&
-                    bookingForm.email.value.trim() &&
-                    bookingForm.phone.value.trim() &&
-                    bookingForm.address.value.trim() &&
-                    bookingForm.pets.value.trim() &&
-                    selectedTimes.length > 0;
-    submitBtn.disabled = !isValid;
+  // Load selected dates from localStorage and show in readonly field
+  function loadSelectedDates() {
+    const savedDates = localStorage.getItem('selectedDates');
+    if (savedDates) {
+      selectedDatesText.value = JSON.parse(savedDates).join(', ');
+    }
   }
 
-  bookingForm.addEventListener('input', validateForm);
-
-  bookingForm.addEventListener('submit', e => {
+  bookingForm.onsubmit = (e) => {
     e.preventDefault();
-    // For now, just show a confirmation alert
-    alert(`Thank you, ${bookingForm.name.value}! Your booking for dates: ${datesTextarea.value} at times: ${timesTextarea.value} has been received.\nWe will contact you at ${bookingForm.email.value} or ${bookingForm.phone.value}.`);
-    // Clear localStorage and redirect back to index
+
+    if (selectedTimes.size === 0) {
+      alert('Please select at least one time block.');
+      return;
+    }
+
+    // Collect data to submit or send email (you can integrate with email sending API here)
+    const bookingData = {
+      name: bookingForm.name.value.trim(),
+      email: bookingForm.email.value.trim(),
+      phone: bookingForm.phone.value.trim(),
+      address: bookingForm.address.value.trim(),
+      pets: bookingForm.pets.value.trim(),
+      dates: selectedDatesText.value,
+      times: Array.from(selectedTimes).join(', ')
+    };
+
+    // For now, just show confirmation alert
+    alert(
+      `Booking Submitted!\n\nName: ${bookingData.name}\nEmail: ${bookingData.email}\nPhone: ${bookingData.phone}\nAddress: ${bookingData.address}\nDates: ${bookingData.dates}\nTimes: ${bookingData.times}\nPets: ${bookingData.pets}`
+    );
+
+    // Clear storage and form if needed
     localStorage.removeItem('selectedDates');
+    bookingForm.reset();
+    selectedTimes.clear();
+    updateSelectedTimes();
+
+    // Redirect back to calendar or thank you page if you want
     window.location.href = 'index.html';
-  });
+  };
 
+  // Initialize
   renderTimeBlocks();
-  validateForm();
+  loadSelectedDates();
+  updateSelectedTimes();
 </script>
-
 </body>
 </html>
