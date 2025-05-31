@@ -1,66 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Booking Calendar</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Select Dates</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 480px;
+    margin: 2rem auto;
+    text-align: center;
+  }
+  .calendar-controls {
+    margin-bottom: 0.5rem;
+  }
+  button {
+    padding: 0.4rem 1rem;
+    margin: 0 1rem;
+    cursor: pointer;
+  }
+  .month-label {
+    font-weight: bold;
+    font-size: 1.25rem;
+  }
+  .weekdays, .days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+  .weekdays div {
+    font-weight: bold;
+    padding: 0.5rem 0;
+  }
+  .day {
+    padding: 0.7rem 0;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    user-select: none;
+  }
+  .day.empty {
+    border: none;
+    cursor: default;
+    background: transparent;
+  }
+  .day.selected {
+    background-color: #007aff;
+    color: white;
+    font-weight: bold;
+  }
+  .next-step-btn {
+    margin-top: 1rem;
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 0.7rem 2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+</style>
+</head>
+<body>
+  <h1>Select Booking Dates</h1>
+  <div class="calendar-controls">
+    <button id="prevMonth">&lt; Prev</button>
+    <span class="month-label" id="monthLabel"></span>
+    <button id="nextMonth">Next &gt;</button>
+  </div>
+  <div class="weekdays">
+    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+  </div>
+  <div class="days" id="calendarDays"></div>
+  <button class="next-step-btn" id="toTimeSelection">Next: Select Time Blocks</button>
+
+<script>
+  const calendarDays = document.getElementById('calendarDays');
+  const monthLabel = document.getElementById('monthLabel');
+  const prevMonthBtn = document.getElementById('prevMonth');
+  const nextMonthBtn = document.getElementById('nextMonth');
+  const toTimeSelectionBtn = document.getElementById('toTimeSelection');
+
+  let currentYear, currentMonth;
+  let selectedDates = new Set();
+
+  function loadSavedDates() {
+    const saved = localStorage.getItem('selectedDates');
+    if (saved) {
+      try {
+        const arr = JSON.parse(saved);
+        selectedDates = new Set(arr);
+      } catch {
+        selectedDates = new Set();
+      }
+    }
+  }
+
+  function saveSelectedDates() {
+    localStorage.setItem('selectedDates', JSON.stringify(Array.from(selectedDates)));
+  }
+
+  function renderCalendar(year, month) {
+    currentYear = year;
+    currentMonth = month;
+
+    monthLabel.textContent = new Date(year, month).toLocaleDateString('default', { year: 'numeric', month: 'long' });
+
+    calendarDays.innerHTML = '';
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Blank cells before first day
+    for (let i = 0; i < firstDay; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.classList.add('day', 'empty');
+      calendarDays.appendChild(emptyCell);
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
+    // Days
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = new Date(year, month, d).toISOString().split('T')[0];
+      const dayCell = document.createElement('div');
+      dayCell.classList.add('day');
+      dayCell.textContent = d;
+      if (selectedDates.has(dateStr)) {
+        dayCell.classList.add('selected');
+      }
+      dayCell.onclick = () => {
+        if (selectedDates.has(dateStr)) {
+          selectedDates.delete(dateStr);
+          dayCell.classList.remove('selected');
+        } else {
+          selectedDates.add(dateStr);
+          dayCell.classList.add('selected');
+        }
+        saveSelectedDates();
+      };
+      calendarDays.appendChild(dayCell);
     }
+  }
 
-    .calendar-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
+  prevMonthBtn.onclick = () => {
+    if (currentMonth === 0) {
+      currentMonth = 11;
+      currentYear--;
+    } else {
+      currentMonth--;
     }
+    renderCalendar(currentYear, currentMonth);
+  };
 
-    .calendar {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0.5rem;
-      max-width: 500px;
+  nextMonthBtn.onclick = () => {
+    if (currentMonth === 11) {
+      currentMonth = 0;
+      currentYear++;
+    } else {
+      currentMonth++;
     }
+    renderCalendar(currentYear, currentMonth);
+  };
 
-    .day, .weekday {
-      padding: 0.75rem;
-      text-align: center;
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-radius: 0.5rem;
-      font-weight: 600;
+  toTimeSelectionBtn.onclick = () => {
+    if (selectedDates.size === 0) {
+      alert('Please select at least one date to continue.');
+      return;
     }
+    // Save and move to time selection page
+    saveSelectedDates();
+    window.location.href = 'time.html';
+  };
 
-    .day {
-      cursor: pointer;
-      font-weight: 400;
-    }
-
-    .day:hover {
-      background-color: #e0f0ff;
-    }
-
-    .day.selected {
-      background-color: #007aff;
-      color: #fff;
-      border-color: #007aff;
-    }
-
-    .time-blocks {
-      display: flex;
-      flex-wrap
+  // Initialize with today
+  const today = new Date();
+  loadSavedDates();
+  renderCalendar(today.getFullYear(), today.getMonth());
+</script>
+</body>
+</html>
