@@ -5,198 +5,179 @@
   <title>Pet Booking</title>
   <style>
     .hidden { display: none; }
-    .calendar, .form-container { margin-top: 20px; }
-    .calendar-nav button { margin-right: 10px; }
-    .calendar-day { display: inline-block; margin: 4px; padding: 8px; border: 1px solid #ccc; cursor: pointer; }
-    .calendar-day.selected { background-color: #cce5ff; }
-    .calendar-header { margin-top: 10px; font-weight: bold; }
+    .calendar-day {
+      display: inline-block;
+      width: 30px;
+      margin: 4px;
+      padding: 5px;
+      text-align: center;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+    .calendar-day.selected { background-color: lightblue; }
+    .calendar-nav button { margin: 5px; }
   </style>
 </head>
 <body>
 
-  <!-- Booking type selection -->
-  <div class="booking-type-container">
-    <h1>Select Booking Type</h1>
+  <!-- Booking Type Selection -->
+  <div id="bookingTypeSelection">
+    <h2>Select Booking Type</h2>
     <button onclick="selectBookingType('dropin')">Drop-in Visit</button>
     <button onclick="selectBookingType('housesitting')">House Sitting</button>
   </div>
 
-  <!-- Drop-in visit calendar -->
+  <!-- Drop-in Calendar -->
   <div id="dropinPage" class="hidden">
-    <h2>Select Dates for Drop-in</h2>
+    <h3>Select Drop-in Dates</h3>
     <div class="calendar-nav">
-      <button id="prevMonth">Previous</button>
-      <button id="nextMonth">Next</button>
+      <button onclick="changeMonth('dropin', -1)">← Previous</button>
+      <span id="dropinMonthLabel"></span>
+      <button onclick="changeMonth('dropin', 1)">Next →</button>
     </div>
-    <div id="calendar" class="calendar"></div>
-    <button id="toTimeSlots">Next: Select Times</button>
+    <div id="dropinCalendar"></div>
+    <button onclick="goToTimeSlots()">Next: Select Time Slots</button>
   </div>
 
-  <!-- Time slot selection -->
-  <div id="timeslots" class="timeslots hidden">
-    <h2>Select Time Slots</h2>
-    <div id="timeslotSections"></div>
-    <button id="backToDates">Back</button>
-    <button id="toForm">Next: Contact Info</button>
+  <!-- Time Slot Selection -->
+  <div id="timeSlotsPage" class="hidden">
+    <h3>Select Time Slots</h3>
+    <div id="selectedDatesList"></div>
+    <button onclick="goBackToDropin()">← Back to Calendar</button>
+    <button onclick="goToDropinForm()">Next: Contact Info</button>
   </div>
 
-  <!-- Drop-in visit form -->
-  <form id="bookingForm" class="form-container hidden">
-    <h2>Contact Info</h2>
-    <!-- Example contact fields -->
-    <label for="name">Name:</label>
-    <input type="text" id="name" required><br><br>
-    <label for="email">Email:</label>
-    <input type="email" id="email" required><br><br>
-    <button type="button" id="backToTimeSlots">Back</button>
-    <button type="submit">Submit Booking</button>
-  </form>
+  <!-- Drop-in Contact Form -->
+  <div id="dropinFormPage" class="hidden">
+    <h3>Drop-in Booking Form</h3>
+    <form>
+      Name: <input type="text"><br><br>
+      Email: <input type="email"><br><br>
+      <button type="button" onclick="goBackToTimeSlots()">← Back to Time Slots</button>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
 
-  <!-- House Sitting calendar -->
+  <!-- House Sitting Calendar -->
   <div id="housesittingPage" class="hidden">
-    <h2>Select House Sitting Dates</h2>
-    <p>Choose the start and end dates</p>
+    <h3>Select House Sitting Dates</h3>
     <div class="calendar-nav">
-      <button id="prevHsMonth">Previous</button>
-      <button id="nextHsMonth">Next</button>
+      <button onclick="changeMonth('housesitting', -1)">← Previous</button>
+      <span id="hsMonthLabel"></span>
+      <button onclick="changeMonth('housesitting', 1)">Next →</button>
     </div>
-    <div id="hsCalendar" class="calendar"></div>
-    <button id="toHsForm">Next: Contact Info</button>
+    <div id="hsCalendar"></div>
+    <button onclick="goToHouseSittingForm()">Next: Contact Info</button>
   </div>
 
-  <!-- House Sitting form -->
-  <form id="houseSittingForm" class="form-container hidden">
-    <h2>House Sitting Info</h2>
-    <!-- Example contact fields -->
-    <label for="hsName">Name:</label>
-    <input type="text" id="hsName" required><br><br>
-    <label for="hsEmail">Email:</label>
-    <input type="email" id="hsEmail" required><br><br>
-    <button type="button" id="backToHsCalendar">Back</button>
-    <button type="submit">Submit Booking</button>
-  </form>
+  <!-- House Sitting Contact Form -->
+  <div id="houseSittingFormPage" class="hidden">
+    <h3>House Sitting Booking Form</h3>
+    <form>
+      Name: <input type="text"><br><br>
+      Email: <input type="email"><br><br>
+      <button type="button" onclick="goBackToHsCalendar()">← Back to Calendar</button>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
 
   <script>
-    const dropinPage = document.getElementById('dropinPage');
-    const housesittingPage = document.getElementById('housesittingPage');
-    const timeslotsDiv = document.getElementById('timeslots');
-    const bookingForm = document.getElementById('bookingForm');
-    const houseSittingForm = document.getElementById('houseSittingForm');
-    const calendar = document.getElementById('calendar');
-    const hsCalendar = document.getElementById('hsCalendar');
-    const toTimeSlotsBtn = document.getElementById('toTimeSlots');
-    const toFormBtn = document.getElementById('toForm');
-    const toHsFormBtn = document.getElementById('toHsForm');
-
-    let bookingType = null;
     let selectedDates = [];
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
-    let hsCurrentMonth = new Date().getMonth();
-    let hsCurrentYear = new Date().getFullYear();
 
     function selectBookingType(type) {
-      bookingType = type;
-      document.querySelector('.booking-type-container').classList.add('hidden');
+      document.getElementById("bookingTypeSelection").classList.add("hidden");
       if (type === 'dropin') {
-        dropinPage.classList.remove('hidden');
-        generateCalendar(currentYear, currentMonth);
-      } else if (type === 'housesitting') {
-        housesittingPage.classList.remove('hidden');
-        generateHsCalendar(hsCurrentYear, hsCurrentMonth);
-      }
-    }
-
-    function generateCalendar(year, month) {
-      calendar.innerHTML = `<div class="calendar-header">${new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' })}</div>`;
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
-        const dateString = date.toISOString().split('T')[0];
-        const dayEl = document.createElement('div');
-        dayEl.className = 'calendar-day';
-        dayEl.textContent = day;
-        dayEl.onclick = () => toggleDate(dateString, dayEl);
-        calendar.appendChild(dayEl);
-      }
-    }
-
-    function generateHsCalendar(year, month) {
-      hsCalendar.innerHTML = `<div class="calendar-header">${new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' })}</div>`;
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
-        const dateString = date.toISOString().split('T')[0];
-        const dayEl = document.createElement('div');
-        dayEl.className = 'calendar-day';
-        dayEl.textContent = day;
-        dayEl.onclick = () => toggleDate(dateString, dayEl);
-        hsCalendar.appendChild(dayEl);
-      }
-    }
-
-    function toggleDate(date, element) {
-      const index = selectedDates.indexOf(date);
-      if (index > -1) {
-        selectedDates.splice(index, 1);
-        element.classList.remove('selected');
+        document.getElementById("dropinPage").classList.remove("hidden");
+        renderCalendar("dropinCalendar", currentYear, currentMonth, "dropin");
       } else {
-        selectedDates.push(date);
-        element.classList.add('selected');
+        document.getElementById("housesittingPage").classList.remove("hidden");
+        renderCalendar("hsCalendar", currentYear, currentMonth, "housesitting");
       }
     }
 
-    // Navigation buttons for Drop-in calendar
-    document.getElementById('prevMonth').onclick = () => {
-      currentMonth--;
-      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-      generateCalendar(currentYear, currentMonth);
-    };
-    document.getElementById('nextMonth').onclick = () => {
-      currentMonth++;
-      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-      generateCalendar(currentYear, currentMonth);
-    };
+    function renderCalendar(containerId, year, month, mode) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const labelId = mode === "dropin" ? "dropinMonthLabel" : "hsMonthLabel";
+      document.getElementById(labelId).innerText =
+        new Date(year, month).toLocaleString("default", { month: "long", year: "numeric" });
 
-    // Navigation buttons for House Sitting calendar
-    document.getElementById('prevHsMonth').onclick = () => {
-      hsCurrentMonth--;
-      if (hsCurrentMonth < 0) { hsCurrentMonth = 11; hsCurrentYear--; }
-      generateHsCalendar(hsCurrentYear, hsCurrentMonth);
-    };
-    document.getElementById('nextHsMonth').onclick = () => {
-      hsCurrentMonth++;
-      if (hsCurrentMonth > 11) { hsCurrentMonth = 0; hsCurrentYear++; }
-      generateHsCalendar(hsCurrentYear, hsCurrentMonth);
-    };
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        const el = document.createElement("div");
+        el.className = "calendar-day";
+        el.textContent = day;
+        if (selectedDates.includes(dateStr)) el.classList.add("selected");
+        el.onclick = () => toggleDateSelection(dateStr, el);
+        container.appendChild(el);
+      }
+    }
 
-    // Transitions for drop-in
-    toTimeSlotsBtn.onclick = () => {
-      dropinPage.classList.add('hidden');
-      timeslotsDiv.classList.remove('hidden');
-    };
-    toFormBtn.onclick = () => {
-      timeslotsDiv.classList.add('hidden');
-      bookingForm.classList.remove('hidden');
-    };
-    document.getElementById('backToDates').onclick = () => {
-      timeslotsDiv.classList.add('hidden');
-      dropinPage.classList.remove('hidden');
-    };
-    document.getElementById('backToTimeSlots').onclick = () => {
-      bookingForm.classList.add('hidden');
-      timeslotsDiv.classList.remove('hidden');
-    };
+    function changeMonth(mode, delta) {
+      currentMonth += delta;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      } else if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      if (mode === 'dropin') {
+        renderCalendar("dropinCalendar", currentYear, currentMonth, "dropin");
+      } else {
+        renderCalendar("hsCalendar", currentYear, currentMonth, "housesitting");
+      }
+    }
 
-    // Transitions for house sitting
-    toHsFormBtn.onclick = () => {
-      housesittingPage.classList.add('hidden');
-      houseSittingForm.classList.remove('hidden');
-    };
-    document.getElementById('backToHsCalendar').onclick = () => {
-      houseSittingForm.classList.add('hidden');
-      housesittingPage.classList.remove('hidden');
-    };
+    function toggleDateSelection(dateStr, el) {
+      const i = selectedDates.indexOf(dateStr);
+      if (i > -1) {
+        selectedDates.splice(i, 1);
+        el.classList.remove("selected");
+      } else {
+        selectedDates.push(dateStr);
+        el.classList.add("selected");
+      }
+    }
+
+    // Navigation logic for drop-in
+    function goToTimeSlots() {
+      if (selectedDates.length === 0) return alert("Please select at least one date.");
+      document.getElementById("dropinPage").classList.add("hidden");
+      const list = document.getElementById("selectedDatesList");
+      list.innerHTML = selectedDates.map(d => `<div>${d}</div>`).join("");
+      document.getElementById("timeSlotsPage").classList.remove("hidden");
+    }
+
+    function goBackToDropin() {
+      document.getElementById("timeSlotsPage").classList.add("hidden");
+      document.getElementById("dropinPage").classList.remove("hidden");
+    }
+
+    function goToDropinForm() {
+      document.getElementById("timeSlotsPage").classList.add("hidden");
+      document.getElementById("dropinFormPage").classList.remove("hidden");
+    }
+
+    function goBackToTimeSlots() {
+      document.getElementById("dropinFormPage").classList.add("hidden");
+      document.getElementById("timeSlotsPage").classList.remove("hidden");
+    }
+
+    // Navigation logic for house sitting
+    function goToHouseSittingForm() {
+      if (selectedDates.length === 0) return alert("Please select at least one date.");
+      document.getElementById("housesittingPage").classList.add("hidden");
+      document.getElementById("houseSittingFormPage").classList.remove("hidden");
+    }
+
+    function goBackToHsCalendar() {
+      document.getElementById("houseSittingFormPage").classList.add("hidden");
+      document.getElementById("housesittingPage").classList.remove("hidden");
+    }
   </script>
 
 </body>
