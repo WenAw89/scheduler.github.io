@@ -159,6 +159,120 @@
   </style>
 </head>
 <body>
-  <!-- body content remains unchanged -->
+  <h2>Book House Sitting</h2>
+  <div class="calendar">
+    <div class="nav-wrapper">
+      <button class="nav-button" id="prevMonth">&#8592;</button>
+      <div class="month-label" id="monthLabel"></div>
+      <button class="nav-button" id="nextMonth">&#8594;</button>
+    </div>
+    <div class="calendar-header calendar-grid">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div id="calendarDays" class="calendar-grid"></div>
+  </div>
+
+  <div class="form-container">
+    <label for="startTime">Start Time *</label>
+    <select id="startTime" required>
+      <option value="">Select start time</option>
+      <option>08:00</option><option>09:00</option><option>10:00</option>
+      <option>11:00</option><option>12:00</option><option>13:00</option>
+      <option>14:00</option><option>15:00</option><option>16:00</option>
+      <option>17:00</option><option>18:00</option>
+    </select>
+
+    <label for="endTime">End Time *</label>
+    <select id="endTime" required>
+      <option value="">Select end time</option>
+      <option>08:00</option><option>09:00</option><option>10:00</option>
+      <option>11:00</option><option>12:00</option><option>13:00</option>
+      <option>14:00</option><option>15:00</option><option>16:00</option>
+      <option>17:00</option><option>18:00</option>
+    </select>
+
+    <button id="submitBtn">Submit</button>
+  </div>
+
+  <script>
+    const calendarDays = document.getElementById("calendarDays");
+    const monthLabel = document.getElementById("monthLabel");
+    const today = new Date();
+    let selectedDates = [];
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+    const oneDayBuffer = new Date();
+    oneDayBuffer.setDate(oneDayBuffer.getDate() + 1);
+
+    function renderCalendar(month, year) {
+      calendarDays.innerHTML = "";
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      monthLabel.textContent = `${today.toLocaleString('default', { month: 'long' })} ${year}`;
+
+      for (let i = 0; i < firstDay; i++) {
+        calendarDays.innerHTML += `<div></div>`;
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(year, month, d);
+        const dateStr = date.toISOString().split('T')[0];
+        const isPastBuffer = date < oneDayBuffer;
+        const isSelected = selectedDates.includes(dateStr);
+
+        const div = document.createElement("div");
+        div.textContent = d;
+        div.className = "day" + (isSelected ? " selected" : "") + (isPastBuffer ? " disabled" : "");
+
+        if (!isPastBuffer) {
+          div.addEventListener("click", () => {
+            if (selectedDates.includes(dateStr)) {
+              selectedDates = selectedDates.filter(d => d !== dateStr);
+              div.classList.remove("selected");
+            } else {
+              selectedDates.push(dateStr);
+              div.classList.add("selected");
+            }
+          });
+        }
+
+        calendarDays.appendChild(div);
+      }
+    }
+
+    document.getElementById("prevMonth").onclick = () => {
+      if (currentMonth === 0) {
+        currentMonth = 11;
+        currentYear--;
+      } else {
+        currentMonth--;
+      }
+      renderCalendar(currentMonth, currentYear);
+    };
+
+    document.getElementById("nextMonth").onclick = () => {
+      if (currentMonth === 11) {
+        currentMonth = 0;
+        currentYear++;
+      } else {
+        currentMonth++;
+      }
+      renderCalendar(currentMonth, currentYear);
+    };
+
+    document.getElementById("submitBtn").onclick = () => {
+      const startTime = document.getElementById("startTime").value;
+      const endTime = document.getElementById("endTime").value;
+      if (!selectedDates.length || !startTime || !endTime) {
+        alert("Please complete all fields.");
+        return;
+      }
+      const dates = encodeURIComponent(selectedDates.join(", "));
+      const url = `https://docs.google.com/forms/d/e/1FAIpQLSf-92UlGBPzpxYes36sJHzBvmhbLPEkXAUsdJxfdB9oYnauhQ/viewform?usp=pp_url&entry.2005620554=Name&entry.1045781291=catdoggoose01@gmail.com&entry.1065046570=mebane+hillsborough&entry.1166974658=1234567890&entry.1821433315=1+cat+2+dog+3+goose&entry.839337160=${dates}&entry.1787818838=${startTime}&entry.633261569=${endTime}`;
+      window.open(url, '_blank');
+    };
+
+    renderCalendar(currentMonth, currentYear);
+  </script>
 </body>
 </html>
