@@ -178,8 +178,8 @@
   </div>
 
   <div class="form-container">
-    <label for="clientName">Name *</label>
-    <input type="text" id="clientName" placeholder="Your name" required>
+    <label for="Name">Name *</label>
+    <input type="text" id="Name" placeholder="Your name" required>
 
     <label for="email">Email *</label>
     <input type="email" id="email" placeholder="Your email" required>
@@ -191,7 +191,7 @@
     <input type="text" id="phone" placeholder="Phone number" required>
 
     <label for="pets">Pets *</label>
-    <input type="text" id="pets" placeholder="e.g. 1 dog, 2 cats" required>
+    <input type="text" id="pets" placeholder="e.g. 1 dog, 2 cats, 3 goose" required>
 
     <label for="startTime">Start Time *</label>
     <select id="startTime" required>
@@ -292,7 +292,7 @@
     };
 
     document.getElementById("submitBtn").onclick = () => {
-      const clientName = document.getElementById("clientName").value;
+      const Name = document.getElementById("Name").value;
       const email = document.getElementById("email").value;
       const location = document.getElementById("location").value;
       const phone = document.getElementById("phone").value;
@@ -305,10 +305,19 @@
         return;
       }
 
-      const url = `https://docs.google.com/forms/d/e/1FAIpQLSf-92UlGBPzpxYes36sJHzBvmhbLPEkXAUsdJxfdB9oYnauhQ/viewform?usp=pp_url&entry.2005620554=${encodeURIComponent(clientName)}&entry.1045781291=${encodeURIComponent(email)}&entry.1065046570=${encodeURIComponent(location)}&entry.1166974658=${encodeURIComponent(phone)}&entry.1821433315=${encodeURIComponent(pets)}&entry.839337160=${rangeStart}+to+${rangeEnd}&entry.1787818838=${encodeURIComponent(startTime)}&entry.633261569=${encodeURIComponent(endTime)}`;
+      const baseURL = `https://docs.google.com/forms/d/e/1FAIpQLSf-92UlGBPzpxYes36sJHzBvmhbLPEkXAUsdJxfdB9oYnauhQ/viewform?usp=pp_url&entry.2005620554=${encodeURIComponent(Name)}&entry.1045781291=${encodeURIComponent(email)}&entry.1065046570=${encodeURIComponent(location)}&entry.1166974658=${encodeURIComponent(phone)}&entry.1821433315=${encodeURIComponent(pets)}&entry.839337160=${rangeStart}+to+${rangeEnd}&entry.1787818838=${encodeURIComponent(startTime)}&entry.633261569=${encodeURIComponent(endTime)}`;
 
-      window.open(url, '_blank');
+      const url = `${baseURL}` +
+        `&entry.2005620554=${name}` +
+        `&entry.1045781291=${email}` +
+        `&entry.1065046570=${location}` +
+        `&entry.1166974658=${phone}` +
+        `&entry.839337160=${datesTimes}` +
+        `&entry.1821433315=${pets}`;
+
+      window.location.href = url;
     };
+
 
     renderCalendar(currentMonth, currentYear);
   </script>
