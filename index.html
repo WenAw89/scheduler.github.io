@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>House Sitting Booking</title>
+  <style>
+    :root {
+      --primary: #007aff;
+      --secondary: #f0f8ff;
+      --accent: #28a745;
+      --disabled: #ccc;
+      --text-dark: #222;
+      --bg-light: #f9f9fb;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      max-width: 700px;
+      margin: auto;
+    }
+
+    h2, h3, h4 {
+      text-align: center;
+      margin-top: 1.2rem;
+      color: var(--text-dark);
+    }
+
+    .calendar, .form-container {
+      margin-top: 1rem;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 0.5rem;
+    }
+
+    .calendar-header div {
+      font-weight: bold;
+      color: #444;
+      text-align: center;
+    }
+
+    .day {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      transition: background 0.2s ease;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .day:hover {
+      background-color: var(--secondary);
+    }
+
+    .day.selected {
+      background-color: var(--primary);
+      color: white;
+      font-weight: bold;
+    }
+
+    .day.disabled {
+      background-color: #eee;
+      color: #aaa;
+      pointer-events: none;
+    }
+
+    .nav-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+
+    .nav-button {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      color: var(--primary);
+      transition: color 0.2s ease;
+    }
+
+    .nav-button:hover {
+      color: #005fcc;
+    }
+
+    .month-label {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      margin: 1.5rem 0 0.5rem;
+      padding: 0.8rem;
+      font-size: 1rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #005fcc;
+    }
+
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    input, textarea, select {
+      padding: 0.6rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 100%;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 500px) {
+      .day {
+        padding: 10px;
+        font-size: 0.85rem;
+      }
+      .month-label {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Book House Sitting</h2>
+  <div id="calendar" class="calendar"></div>
+  <form id="bookingForm" class="form-container hidden">
+    <h2>Contact Info</h2>
+    <input id="name" type="text" placeholder="Full Name *" required />
+    <input id="email" type="email" placeholder="Email *" required />
+    <input id="phone" type="tel" placeholder="Phone Number *" required />
+    <input id="address" type="text" placeholder="Address *" required />
+    <label for="startTime">Start Time *</label>
+    <select id="startTime" required>
+      <option value="">Select start time</option>
+      <option>08:00</option>
+      <option>09:00</option>
+      <option>10:00</option>
+      <option>11:00</option>
+      <option>12:00</option>
+      <option>13:00</option>
+      <option>14:00</option>
+      <option>15:00</option>
+      <option>16:00</option>
+      <option>17:00</option>
+      <option>18:00</option>
+    </select>
+    <label for="endTime">End Time *</label>
+    <select id="endTime" required>
+      <option value="">Select end time</option>
+      <option>08:00</option>
+      <option>09:00</option>
+      <option>10:00</option>
+      <option>11:00</option>
+      <option>12:00</option>
+      <option>13:00</option>
+      <option>14:00</option>
+      <option>15:00</option>
+      <option>16:00</option>
+      <option>17:00</option>
+      <option>18:00</option>
+    </select>
+    <textarea id="pets" rows="4" placeholder="Tell me about your pets..."></textarea>
+    <textarea id="summary" rows="4" readonly></textarea>
+    <button type="submit">Submit Booking</button>
+  </form>
+  <script>
+    const calendar = document.getElementById('calendar');
+    const bookingForm = document.getElementById('bookingForm');
+    const summary = document.getElementById('summary');
+
+    let selectedStart = null;
+    let selectedEnd = null;
+    let currentYear, currentMonth;
+
+    function generateCalendar(year, month) {
+      currentYear = year;
+      currentMonth = month;
+      calendar.innerHTML = '';
+
+      const nav = document.createElement('div');
+      nav.className = 'nav-wrapper';
+
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = '←';
+      prevBtn.className = 'nav-button';
+      prevBtn.onclick = () => {
+        let newMonth = currentMonth - 1;
+        let newYear = currentYear;
+        if (newMonth < 0) {
+          newMonth = 11;
+          newYear--;
+        }
+        generateCalendar(newYear, newMonth);
+      };
+
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = '→';
+      nextBtn.className = 'nav-button';
+      nextBtn.onclick = () => {
+        let newMonth = currentMonth + 1;
+        let newYear = currentYear;
+        if (newMonth > 11) {
+          newMonth = 0;
+          newYear++;
+        }
+        generateCalendar(newYear, newMonth);
+      };
+
+      const title = document.createElement('div');
+      title.className = 'month-label';
+      title.textContent = new Date(year, month).toLocaleString('default', {
+        month: 'long',
+        year: 'numeric'
+      });
+
+      nav.appendChild(prevBtn);
+      nav.appendChild(title);
+      nav.appendChild(nextBtn);
+      calendar.appendChild(nav);
+
+      const grid = document.createElement('div');
+      grid.className = 'calendar-grid';
+
+      const headers = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      headers.forEach(h => {
+        const el = document.createElement('div');
+        el.className = 'calendar-header';
+        el.textContent = h;
+        grid.appendChild(el);
+      });
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const startDay = new Date(year, month, 1).getDay();
+      const now = new Date();
+      const buffer = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+      for (let i = 0; i < startDay; i++) {
+        grid.appendChild(document.createElement('div'));
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(year, month, d);
+        const dateStr = date.toISOString().split('T')[0];
+        const day = document.createElement('div');
+        day.className = 'day';
+        day.textContent = d;
+
+        if (date < buffer) {
+          day.classList.add('disabled');
+        } else {
+          if (selectedStart && selectedEnd && date >= selectedStart && date <= selectedEnd) {
+            day.classList.add('selected');
+          }
+          day.onclick = () => {
+            if (!selectedStart || (selectedStart && selectedEnd)) {
+              selectedStart = date;
+              selectedEnd = null;
+            } else if (date >= selectedStart) {
+              selectedEnd = date;
+            } else {
+              selectedStart = date;
+              selectedEnd = null;
+            }
+            generateCalendar(currentYear, currentMonth);
+            if (selectedStart && selectedEnd) {
+              summary.value = `${selectedStart.toISOString().split('T')[0]} to ${selectedEnd.toISOString().split('T')[0]}`;
+              bookingForm.classList.remove('hidden');
+            } else {
+              summary.value = '';
+              bookingForm.classList.add('hidden');
+            }
+          };
+        }
+
+        grid.appendChild(day);
+      }
+
+      calendar.appendChild(grid);
+    }
+
+    bookingForm.onsubmit = (e) => {
+      e.preventDefault();
+      const name = encodeURIComponent(document.getElementById('name').value);
+      const email = encodeURIComponent(document.getElementById('email').value);
+      const phone = encodeURIComponent(document.getElementById('phone').value);
+      const address = encodeURIComponent(document.getElementById('address').value);
+      const pets = encodeURIComponent(document.getElementById('pets').value);
+      const summaryVal = encodeURIComponent(summary.value.trim());
+
+      const baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/viewform?usp=dialog';
+      const url = `${baseURL}` +
+        `&entry.2005620554=${name}` +
+        `&entry.1045781291=${email}` +
+        `&entry.1065046570=${address}` +
+        `&entry.1166974658=${phone}` +
+        `&entry.839337160=${summaryVal}` +
+        `&entry.2080923976=${pets}`;
+
+      window.location.href = url;
+    };
+
+    const today = new Date();
+    generateCalendar(today.getFullYear(), today.getMonth());
+  </script>
+</body>
+</html>
