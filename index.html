@@ -274,7 +274,6 @@
 
       for (let d = 1; d <= daysInMonth; d++) {
         const date = new Date(year, month, d);
-        const dateStr = date.toISOString().split('T')[0];
         const day = document.createElement('div');
         day.className = 'day';
         day.textContent = d;
@@ -320,15 +319,19 @@
       const address = encodeURIComponent(document.getElementById('address').value);
       const pets = encodeURIComponent(document.getElementById('pets').value);
       const summaryVal = encodeURIComponent(summary.value.trim());
+      const startTime = encodeURIComponent(document.getElementById('startTime').value);
+      const endTime = encodeURIComponent(document.getElementById('endTime').value);
 
-      const baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLSeei3yQ8YRVchlSk5gnQiVmcZTJKfGaf-O4m9fB72FjAqmudQ/viewform?usp=dialog';
+      const baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLSf-92UlGBPzpxYes36sJHzBvmhbLPEkXAUsdJxfdB9oYnauhQ/viewform?usp=pp_url';
       const url = `${baseURL}` +
         `&entry.2005620554=${name}` +
         `&entry.1045781291=${email}` +
         `&entry.1065046570=${address}` +
         `&entry.1166974658=${phone}` +
+        `&entry.1821433315=${pets}` +
         `&entry.839337160=${summaryVal}` +
-        `&entry.2080923976=${pets}`;
+        `&entry.1787818838=${startTime}` +
+        `&entry.633261569=${endTime}`;
 
       window.location.href = url;
     };
