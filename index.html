@@ -291,32 +291,34 @@
       renderCalendar(currentMonth, currentYear);
     };
 
-    document.getElementById("submitBtn").onclick = () => {
-      const Name = document.getElementById("Name").value;
-      const email = document.getElementById("email").value;
-      const location = document.getElementById("location").value;
-      const phone = document.getElementById("phone").value;
-      const pets = document.getElementById("pets").value;
-      const startTime = document.getElementById("startTime").value;
-      const endTime = document.getElementById("endTime").value;
+document.getElementById("submitBtn").onclick = () => {
+  const Name = document.getElementById("Name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const location = document.getElementById("location").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const pets = document.getElementById("pets").value.trim();
+  const startTime = document.getElementById("startTime").value;
+  const endTime = document.getElementById("endTime").value;
 
-      if (!rangeStart || !rangeEnd || !clientName || !email || !location || !phone || !pets || !startTime || !endTime) {
-        alert("Please complete all fields and select a date range.");
-        return;
-      }
+  if (!rangeStart || !rangeEnd || !Name || !email || !location || !phone || !pets || !startTime || !endTime) {
+    alert("Please complete all fields and select a date range.");
+    return;
+  }
 
-      const baseURL = `https://docs.google.com/forms/d/e/1FAIpQLSf-92UlGBPzpxYes36sJHzBvmhbLPEkXAUsdJxfdB9oYnauhQ/viewform?usp=pp_url&entry.2005620554=${encodeURIComponent(Name)}&entry.1045781291=${encodeURIComponent(email)}&entry.1065046570=${encodeURIComponent(location)}&entry.1166974658=${encodeURIComponent(phone)}&entry.1821433315=${encodeURIComponent(pets)}&entry.839337160=${rangeStart}+to+${rangeEnd}&entry.1787818838=${encodeURIComponent(startTime)}&entry.633261569=${encodeURIComponent(endTime)}`;
+  const fullRange = `${rangeStart} to ${rangeEnd}`;
 
-      const url = `${baseURL}` +
-        `&entry.2005620554=${name}` +
-        `&entry.1045781291=${email}` +
-        `&entry.1065046570=${location}` +
-        `&entry.1166974658=${phone}` +
-        `&entry.839337160=${datesTimes}` +
-        `&entry.1821433315=${pets}`;
+  const formURL = `https://docs.google.com/forms/d/e/1FAIpQLSf-92UlGBPzpxYes36sJHzBvmhbLPEkXAUsdJxfdB9oYnauhQ/viewform?usp=pp_url` +
+    `&entry.2005620554=${encodeURIComponent(Name)}` +     // Name
+    `&entry.1045781291=${encodeURIComponent(email)}` +    // Email
+    `&entry.1065046570=${encodeURIComponent(location)}` + // Location
+    `&entry.1166974658=${encodeURIComponent(phone)}` +    // Phone
+    `&entry.1821433315=${encodeURIComponent(pets)}` +     // Pets
+    `&entry.839337160=${encodeURIComponent(fullRange)}` + // Date range
+    `&entry.1787818838=${encodeURIComponent(startTime)}` +// Start time
+    `&entry.633261569=${encodeURIComponent(endTime)}`;    // End time
 
-      window.location.href = url;
-    };
+  window.location.href = formURL;
+};
 
 
     renderCalendar(currentMonth, currentYear);
