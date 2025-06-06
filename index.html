@@ -69,6 +69,11 @@
       font-weight: bold;
     }
 
+    .day.in-range {
+      background-color: var(--accent);
+      color: white;
+    }
+
     .day.disabled {
       background-color: #eee;
       color: #aaa;
@@ -173,6 +178,21 @@
   </div>
 
   <div class="form-container">
+    <label for="clientName">Name *</label>
+    <input type="text" id="clientName" placeholder="Your name" required>
+
+    <label for="email">Email *</label>
+    <input type="email" id="email" placeholder="Your email" required>
+
+    <label for="location">Location *</label>
+    <input type="text" id="location" placeholder="Your location" required>
+
+    <label for="phone">Phone *</label>
+    <input type="text" id="phone" placeholder="Phone number" required>
+
+    <label for="pets">Pets *</label>
+    <input type="text" id="pets" placeholder="e.g. 1 dog, 2 cats" required>
+
     <label for="startTime">Start Time *</label>
     <select id="startTime" required>
       <option value="">Select start time</option>
@@ -198,7 +218,8 @@
     const calendarDays = document.getElementById("calendarDays");
     const monthLabel = document.getElementById("monthLabel");
     const today = new Date();
-    let selectedDates = [];
+    let rangeStart = null;
+    let rangeEnd = null;
     let currentMonth = today.getMonth();
     let currentYear = today.getFullYear();
     const oneDayBuffer = new Date();
@@ -208,7 +229,7 @@
       calendarDays.innerHTML = "";
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      monthLabel.textContent = `${today.toLocaleString('default', { month: 'long' })} ${year}`;
+      monthLabel.textContent = `${new Date(year, month).toLocaleString('default', { month: 'long' })} ${year}`;
 
       for (let i = 0; i < firstDay; i++) {
         calendarDays.innerHTML += `<div></div>`;
@@ -218,26 +239,36 @@
         const date = new Date(year, month, d);
         const dateStr = date.toISOString().split('T')[0];
         const isPastBuffer = date < oneDayBuffer;
-        const isSelected = selectedDates.includes(dateStr);
-
         const div = document.createElement("div");
         div.textContent = d;
-        div.className = "day" + (isSelected ? " selected" : "") + (isPastBuffer ? " disabled" : "");
-
-        if (!isPastBuffer) {
-          div.addEventListener("click", () => {
-            if (selectedDates.includes(dateStr)) {
-              selectedDates = selectedDates.filter(d => d !== dateStr);
-              div.classList.remove("selected");
-            } else {
-              selectedDates.push(dateStr);
-              div.classList.add("selected");
-            }
-          });
+        div.className = "day";
+        if (isPastBuffer) {
+          div.classList.add("disabled");
+        } else {
+          if (rangeStart && dateStr === rangeStart) div.classList.add("selected");
+          if (rangeEnd && dateStr === rangeEnd) div.classList.add("selected");
+          if (rangeStart && rangeEnd && date >= new Date(rangeStart) && date <= new Date(rangeEnd)) {
+            div.classList.add("in-range");
+          }
+          div.addEventListener("click", () => handleRangeSelect(dateStr));
         }
-
         calendarDays.appendChild(div);
       }
+    }
+
+    function handleRangeSelect(dateStr) {
+      if (!rangeStart || (rangeStart && rangeEnd)) {
+        rangeStart = dateStr;
+        rangeEnd = null;
+      } else {
+        if (new Date(dateStr) < new Date(rangeStart)) {
+          rangeEnd = rangeStart;
+          rangeStart = dateStr;
+        } else {
+          rangeEnd = dateStr;
+        }
+      }
+      renderCalendar(currentMonth, currentYear);
     }
 
     document.getElementById("prevMonth").onclick = () => {
@@ -261,14 +292,21 @@
     };
 
     document.getElementById("submitBtn").onclick = () => {
+      const clientName = document.getElementById("clientName").value;
+      const email = document.getElementById("email").value;
+      const location = document.getElementById("location").value;
+      const phone = document.getElementById("phone").value;
+      const pets = document.getElementById("pets").value;
       const startTime = document.getElementById("startTime").value;
       const endTime = document.getElementById("endTime").value;
-      if (!selectedDates.length || !startTime || !endTime) {
-        alert("Please complete all fields.");
+
+      if (!rangeStart || !rangeEnd || !clientName || !email || !location || !phone || !pets || !startTime || !endTime) {
+        alert("Please complete all fields and select a date range.");
         return;
       }
-      const dates = encodeURIComponent(selectedDates.join(", "));
-      const url = `https://docs.google.com/forms/d/e/1FAIpQLSf-92UlGBPzpxYes36sJHzBvmhbLPEkXAUsdJxfdB9oYnauhQ/viewform?usp=pp_url&entry.2005620554=Name&entry.1045781291=catdoggoose01@gmail.com&entry.1065046570=mebane+hillsborough&entry.1166974658=1234567890&entry.1821433315=1+cat+2+dog+3+goose&entry.839337160=${dates}&entry.1787818838=${startTime}&entry.633261569=${endTime}`;
+
+      const url = `https://docs.google.com/forms/d/e/1FAIpQLSf-92UlGBPzpxYes36sJHzBvmhbLPEkXAUsdJxfdB9oYnauhQ/viewform?usp=pp_url&entry.2005620554=${encodeURIComponent(clientName)}&entry.1045781291=${encodeURIComponent(email)}&entry.1065046570=${encodeURIComponent(location)}&entry.1166974658=${encodeURIComponent(phone)}&entry.1821433315=${encodeURIComponent(pets)}&entry.839337160=${rangeStart}+to+${rangeEnd}&entry.1787818838=${encodeURIComponent(startTime)}&entry.633261569=${encodeURIComponent(endTime)}`;
+
       window.open(url, '_blank');
     };
 
