@@ -1,327 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>House Sitting Booking</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cat Dog Goose - Pet Care</title>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #007aff;
-      --secondary: #f0f8ff;
-      --accent: #28a745;
-      --disabled: #ccc;
-      --text-dark: #222;
-      --bg-light: #f9f9fb;
-    }
-
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Poppins', sans-serif;
       margin: 0;
-      padding: 1rem;
-      background-color: var(--bg-light);
-      color: var(--text-dark);
-      max-width: 700px;
-      margin: auto;
-    }
-
-    h2, h3, h4 {
-      text-align: center;
-      margin-top: 1.2rem;
-      color: var(--text-dark);
-    }
-
-    .calendar, .form-container {
-      margin-top: 1rem;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
-      margin-top: 0.5rem;
-    }
-
-    .calendar-header div {
-      font-weight: bold;
-      color: #444;
-      text-align: center;
-    }
-
-    .day {
-      background: #fff;
-      border-radius: 10px;
-      padding: 12px;
-      text-align: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      transition: background 0.2s ease;
-      cursor: pointer;
-      font-size: 0.95rem;
-      touch-action: manipulation;
-    }
-
-    .day:hover {
-      background-color: var(--secondary);
-    }
-
-    .day.selected {
-      background-color: var(--primary);
-      color: white;
-      font-weight: bold;
-    }
-
-    .day.in-range {
-      background-color: var(--accent);
-      color: white;
-    }
-
-    .day.disabled {
-      background-color: #eee;
-      color: #aaa;
-      pointer-events: none;
-    }
-
-    .nav-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 10px;
-      gap: 10px;
-    }
-
-    .nav-button {
-      background: none;
-      border: none;
-      font-size: 1.1rem;
-      cursor: pointer;
-      padding: 2px 6px;
-      color: var(--primary);
-      transition: color 0.2s ease;
-    }
-
-    .nav-button:hover {
-      color: #005fcc;
-    }
-
-    .month-label {
-      font-size: 1.2rem;
-      font-weight: bold;
+      padding: 0;
+      background: #fefefe;
       color: #333;
+      line-height: 1.6;
     }
 
-    button {
-      display: block;
-      width: 100%;
-      margin: 1.5rem 0 0.5rem;
-      padding: 0.8rem;
-      font-size: 1rem;
-      background-color: var(--primary);
+    header {
+      background: #5c8ed8;
       color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-
-    button:hover {
-      background-color: #005fcc;
-    }
-
-    .form-container {
+      padding: 1rem 2rem;
       display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-top: 1rem;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    input, textarea, select {
-      padding: 0.6rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+    .logo-title {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-title img {
+      height: 100px;
+      margin-right: 1rem;
+    }
+
+    .logo-title h1 {
+      margin: 0;
+      font-family: 'Abril Fatface', serif;
+      font-size: 2rem;
+    }
+
+    nav a {
+      color: white;
+      margin-left: 1rem;
+      text-decoration: none;
+      font-weight: bold;
+      background: #3a6dcf;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    nav a:hover {
+      background: #2e58b6;
+    }
+
+    .hero {
+      background: #fff4ef;
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+    }
+
+    .hero h2 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+    }
+
+    .collage-container img {
       width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+      display: block;
     }
 
-    textarea {
-      resize: vertical;
+    .rates {
+      background: #f0f4fc;
+      padding: 2rem 1rem;
+      text-align: center;
     }
 
-    .hidden {
-      display: none;
+    .rates h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
     }
 
-    @media (max-width: 500px) {
-      .day {
-        padding: 8px;
-        font-size: 0.8rem;
+    .rates ul {
+      list-style: none;
+      padding: 0;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .rates li {
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .contact {
+      background: #e9f3ff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    .contact p, .contact a {
+      font-size: 1.1rem;
+      color: #3a6dcf;
+      text-decoration: none;
+    }
+
+    .carousel-container {
+      overflow: hidden;
+      background: white;
+    }
+
+    .carousel-track {
+      display: flex;
+      animation: scroll 60s linear infinite;
+    }
+
+    .carousel-track img {
+      width: 120px;
+      padding: 6px;
+      background-color: white;
+    }
+
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    footer {
+      background: #5c8ed8;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .logo-title {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
       }
-      .month-label {
-        font-size: 1rem;
+
+      .logo-title img {
+        height: 80px;
+        margin-bottom: 0.5rem;
       }
-      .calendar-grid {
-        gap: 5px;
+
+      nav {
+        width: 100%;
+        text-align: center;
+        margin-top: 1rem;
+      }
+
+      nav a {
+        display: inline-block;
+        margin: 0.5rem 0.5rem;
       }
     }
   </style>
 </head>
 <body>
-  <h2>Book House Sitting</h2>
-  <div class="calendar">
-    <div class="nav-wrapper">
-      <button class="nav-button" id="prevMonth">&#8592;</button>
-      <div class="month-label" id="monthLabel"></div>
-      <button class="nav-button" id="nextMonth">&#8594;</button>
+
+  <header>
+    <div class="logo-title">
+      <img src="catdoggoose.png" alt="Cat Dog Goose Logo" />
+      <h1>Cat, Dog, Goose</h1>
     </div>
-    <div class="calendar-header calendar-grid">
-      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-    </div>
-    <div id="calendarDays" class="calendar-grid"></div>
+    <nav>
+      <a href="/meet&greet">Meet & Greet</a>
+      <a href="/dropin">Drop‑In Visits</a>
+      <a href="/housesit">House Sitting</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <h2>Give Your Pets the Care They Deserve</h2>
+    <p>Personalized, professional pet sitting for your cats, dogs, and the occasional goose in Mebane and surrounding areas.</p>
   </div>
 
-  <div class="form-container">
-    <label for="Name">Name *</label>
-    <input type="text" id="Name" placeholder="Your name" required>
-
-    <label for="email">Email *</label>
-    <input type="email" id="email" placeholder="Your email" required>
-
-    <label for="location">Location *</label>
-    <input type="text" id="location" placeholder="Your location" required>
-
-    <label for="phone">Phone *</label>
-    <input type="text" id="phone" placeholder="Phone number" required>
-
-    <label for="pets">Pets *</label>
-    <input type="text" id="pets" placeholder="e.g. 1 dog, 2 cats, 3 goose" required>
-
-    <label for="startTime">Start Time *</label>
-    <select id="startTime" required>
-      <option value="">Select start time</option>
-      <option>08:00</option><option>09:00</option><option>10:00</option>
-      <option>11:00</option><option>12:00</option><option>13:00</option>
-      <option>14:00</option><option>15:00</option><option>16:00</option>
-      <option>17:00</option><option>18:00</option>
-    </select>
-
-    <label for="endTime">End Time *</label>
-    <select id="endTime" required>
-      <option value="">Select end time</option>
-      <option>08:00</option><option>09:00</option><option>10:00</option>
-      <option>11:00</option><option>12:00</option><option>13:00</option>
-      <option>14:00</option><option>15:00</option><option>16:00</option>
-      <option>17:00</option><option>18:00</option>
-    </select>
-
-    <button id="submitBtn">Submit</button>
+  <div class="collage-container">
+    <img src="collagevFin.png" alt="Happy Pets Collage" />
   </div>
 
-  <script>
-    const calendarDays = document.getElementById("calendarDays");
-    const monthLabel = document.getElementById("monthLabel");
-    const today = new Date();
-    let rangeStart = null;
-    let rangeEnd = null;
-    let currentMonth = today.getMonth();
-    let currentYear = today.getFullYear();
-    const oneDayBuffer = new Date();
-    oneDayBuffer.setDate(oneDayBuffer.getDate() + 1);
+  <div class="rates">
+    <h2>Rates</h2>
+    <ul>
+      <li><strong>Meet and Greet:</strong> Free</li>
+      <li><strong>Drop-in Visits:</strong> $25 for the first pet, +$5 per additional</li>
+      <li><strong>House Sitting:</strong> $65 for the first pet, +$20 per additional</li>
+      <li><strong>Overnight & Puppy Care:</strong> $140/night</li>
+    </ul>
+  </div>
 
-    function renderCalendar(month, year) {
-      calendarDays.innerHTML = "";
-      const firstDay = new Date(year, month, 1).getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      monthLabel.textContent = `${new Date(year, month).toLocaleString('default', { month: 'long' })} ${year}`;
+  <div class="contact">
+    <p>Text or call <a href="tel:3365251338">(336) 525-1338</a> or <a href="mailto:catdoggoose01@gmail.com">email us</a> to learn more.</p>
+  </div>
 
-      for (let i = 0; i < firstDay; i++) {
-        calendarDays.innerHTML += `<div></div>`;
-      }
+  <div class="carousel-container">
+    <div class="carousel-track">
+      <!-- Repeat your image blocks for smooth scrolling -->
+      <img src="image1.jpg" alt="Pet 1" />
+      <img src="image2.jpeg" alt="Pet 2" />
+      <img src="image3.jpg" alt="Pet 3" />
+      <img src="image4.jpg" alt="Pet 4" />
+      <!-- Duplicate images -->
+      <img src="image1.jpg" alt="Pet 1" />
+      <img src="image2.jpeg" alt="Pet 2" />
+      <img src="image3.jpg" alt="Pet 3" />
+      <img src="image4.jpg" alt="Pet 4" />
+    </div>
+  </div>
 
-      for (let d = 1; d <= daysInMonth; d++) {
-        const date = new Date(year, month, d);
-        const dateStr = date.toISOString().split('T')[0];
-        const isPastBuffer = date < oneDayBuffer;
-        const div = document.createElement("div");
-        div.textContent = d;
-        div.className = "day";
-        if (isPastBuffer) {
-          div.classList.add("disabled");
-        } else {
-          if (rangeStart && dateStr === rangeStart) div.classList.add("selected");
-          if (rangeEnd && dateStr === rangeEnd) div.classList.add("selected");
-          if (rangeStart && rangeEnd && date >= new Date(rangeStart) && date <= new Date(rangeEnd)) {
-            div.classList.add("in-range");
-          }
-          div.addEventListener("click", () => handleRangeSelect(dateStr));
-        }
-        calendarDays.appendChild(div);
-      }
-    }
+  <footer>
+    &copy; 2025 Cat Dog Goose • Mebane, NC • All rights reserved.
+  </footer>
 
-    function handleRangeSelect(dateStr) {
-      if (!rangeStart || (rangeStart && rangeEnd)) {
-        rangeStart = dateStr;
-        rangeEnd = null;
-      } else {
-        if (new Date(dateStr) < new Date(rangeStart)) {
-          rangeEnd = rangeStart;
-          rangeStart = dateStr;
-        } else {
-          rangeEnd = dateStr;
-        }
-      }
-      renderCalendar(currentMonth, currentYear);
-    }
-
-    document.getElementById("prevMonth").onclick = () => {
-      if (currentMonth === 0) {
-        currentMonth = 11;
-        currentYear--;
-      } else {
-        currentMonth--;
-      }
-      renderCalendar(currentMonth, currentYear);
-    };
-
-    document.getElementById("nextMonth").onclick = () => {
-      if (currentMonth === 11) {
-        currentMonth = 0;
-        currentYear++;
-      } else {
-        currentMonth++;
-      }
-      renderCalendar(currentMonth, currentYear);
-    };
-
-document.getElementById("submitBtn").onclick = () => {
-  const Name = document.getElementById("Name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const location = document.getElementById("location").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const pets = document.getElementById("pets").value.trim();
-  const startTime = document.getElementById("startTime").value;
-  const endTime = document.getElementById("endTime").value;
-
-  if (!rangeStart || !rangeEnd || !Name || !email || !location || !phone || !pets || !startTime || !endTime) {
-    alert("Please complete all fields and select a date range.");
-    return;
-  }
-
-  const fullRange = `${rangeStart} to ${rangeEnd}`;
-
-  const formURL = `https://docs.google.com/forms/d/e/1FAIpQLSf-92UlGBPzpxYes36sJHzBvmhbLPEkXAUsdJxfdB9oYnauhQ/viewform?usp=pp_url` +
-    `&entry.2005620554=${encodeURIComponent(Name)}` +     // Name
-    `&entry.1045781291=${encodeURIComponent(email)}` +    // Email
-    `&entry.1065046570=${encodeURIComponent(location)}` + // Location
-    `&entry.1166974658=${encodeURIComponent(phone)}` +    // Phone
-    `&entry.1821433315=${encodeURIComponent(pets)}` +     // Pets
-    `&entry.839337160=${encodeURIComponent(fullRange)}` + // Date range
-    `&entry.1787818838=${encodeURIComponent(startTime)}` +// Start time
-    `&entry.633261569=${encodeURIComponent(endTime)}`;    // End time
-
-  window.location.href = formURL;
-};
-
-
-    renderCalendar(currentMonth, currentYear);
-  </script>
 </body>
 </html>
