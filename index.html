@@ -16,30 +16,22 @@
     }
 
     header {
-      background: #5c8ed8;
-      color: white;
-      padding: 1rem 2rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .logo-title {
+      background-image: url('webcatdoggoose.png');
+      background-size: cover;
+      background-position: center;
+      height: 250px;
       display: flex;
       align-items: center;
-    }
-
-    .logo-title img {
-      height: 100px;
-      margin-right: 1rem;
+      justify-content: center;
     }
 
     .logo-title h1 {
-      margin: 0;
+      color: white;
       font-family: 'Abril Fatface', serif;
-      font-size: 2rem;
+      font-size: 2.5rem;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
     }
 
     nav {
@@ -154,19 +146,13 @@
     }
 
     @media (max-width: 768px) {
-      .logo-title {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-
-      .logo-title img {
-        height: 80px;
-        margin-bottom: 0.5rem;
+      .logo-title h1 {
+        font-size: 1.8rem;
+        padding: 0.3rem 0.75rem;
       }
 
       nav {
-        padding: 1rem 1rem;
+        padding: 1rem;
       }
 
       nav a {
@@ -180,7 +166,6 @@
 
   <header>
     <div class="logo-title">
-      <img src="webcatdoggoose.png" alt="Cat Dog Goose Logo" />
       <h1>Cat, Dog, Goose</h1>
     </div>
   </header>
@@ -216,12 +201,10 @@
 
   <div class="carousel-container">
     <div class="carousel-track">
-      <!-- Repeat your image blocks for smooth scrolling -->
       <img src="image1.jpg" alt="Pet 1" />
       <img src="image2.jpeg" alt="Pet 2" />
       <img src="image3.jpg" alt="Pet 3" />
       <img src="image4.jpg" alt="Pet 4" />
-      <!-- Duplicate images -->
       <img src="image1.jpg" alt="Pet 1" />
       <img src="image2.jpeg" alt="Pet 2" />
       <img src="image3.jpg" alt="Pet 3" />
