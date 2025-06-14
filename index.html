@@ -6,6 +6,10 @@
   <title>Cat Dog Goose - Pet Care</title>
   <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -15,42 +19,56 @@
       line-height: 1.6;
     }
 
-    header {
+    /* === Fixed Top Bar === */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      padding: 0;
-      margin: 0;
-      background: none;
-    }
-    
-    .header-image {
-      display: block;
-      width: 100%;
-      height: auto;
-      margin: 0 auto; /* center the image */
-    }
-    
-    nav {
-      background: #3a6dcf;
-      padding: 0.75rem 2rem;
-      text-align: center;
+      background: white;
+      border-bottom: 1px solid #ccc;
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
     }
 
-    nav a {
+    .contact-info {
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .contact-info a {
+      text-decoration: none;
+      color: #3a6dcf;
+      margin-right: 1rem;
+    }
+
+    .nav-buttons a {
       color: white;
-      margin: 0 0.75rem;
+      margin-left: 0.75rem;
       text-decoration: none;
       font-weight: bold;
       background: #264db5;
       padding: 0.5rem 1rem;
       border-radius: 5px;
       transition: background 0.3s;
-      display: inline-block;
     }
 
-    nav a:hover {
+    .nav-buttons a:hover {
       background: #1e3f95;
     }
 
+    /* === Logo Image === */
+    .header-image {
+      margin-top: 70px; /* space below fixed top bar */
+      width: 100%;
+      display: block;
+      height: auto;
+    }
+
+    /* === Hero Section (optional) === */
     .hero {
       background: #fff4ef;
       text-align: center;
@@ -68,13 +86,7 @@
       font-size: 1.1rem;
     }
 
-    .collage-container img {
-      width: 100%;
-      max-height: 400px;
-      object-fit: cover;
-      display: block;
-    }
-
+    /* === Rates Section === */
     .rates {
       background: #f0f4fc;
       padding: 2rem 1rem;
@@ -99,39 +111,6 @@
       font-size: 1.1rem;
     }
 
-    .contact {
-      background: #e9f3ff;
-      padding: 2rem 1rem;
-      text-align: center;
-    }
-
-    .contact p, .contact a {
-      font-size: 1.1rem;
-      color: #3a6dcf;
-      text-decoration: none;
-    }
-
-    .carousel-container {
-      overflow: hidden;
-      background: white;
-    }
-
-    .carousel-track {
-      display: flex;
-      animation: scroll 60s linear infinite;
-    }
-
-    .carousel-track img {
-      width: 120px;
-      padding: 6px;
-      background-color: white;
-    }
-
-    @keyframes scroll {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
     footer {
       background: #5c8ed8;
       color: white;
@@ -141,45 +120,48 @@
     }
 
     @media (max-width: 768px) {
-      .logo-title h1 {
-        font-size: 1.8rem;
-        padding: 0.3rem 0.75rem;
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
-      nav {
-        padding: 1rem;
+      .nav-buttons {
+        margin-top: 0.5rem;
       }
 
-      nav a {
-        display: inline-block;
-        margin: 0.5rem 0.5rem;
+      .nav-buttons a {
+        margin-left: 0;
+        margin-right: 0.5rem;
       }
     }
   </style>
 </head>
 <body>
-  
-  <header>
-    <img src="webcatdoggoose.png" alt="Cat Dog Goose Banner" class="header-image" />
-  </header>
-  
-  <nav class="main-nav">
-    <a href="/meet&greet">Meet & Greet</a>
-    <a href="/dropin">Drop‑In Visits</a>
-    <a href="/housesit">House Sitting</a>
-  </nav>
 
+  <!-- Fixed top bar -->
+  <div class="top-bar">
+    <div class="contact-info">
+      <a href="tel:3365251338">(336) 525-1338</a>
+      <a href="mailto:catdoggoose01@gmail.com">catdoggoose01@gmail.com</a>
+    </div>
+    <div class="nav-buttons">
+      <a href="#meetgreet">Meet & Greet</a>
+      <a href="#dropin">Drop‑In Visits</a>
+      <a href="#housesit">House Sitting</a>
+    </div>
+  </div>
 
+  <!-- Header image -->
+  <img src="webcatdoggoose.png" alt="Cat Dog Goose Banner" class="header-image" />
+
+  <!-- Optional Hero Section -->
   <div class="hero">
     <h2>Give Your Pets the Care They Deserve</h2>
     <p>Personalized, professional pet sitting for your cats, dogs, and the occasional goose in Mebane and surrounding areas.</p>
   </div>
 
-  <div class="collage-container">
-    <img src="collagevFin.png" alt="Happy Pets Collage" />
-  </div>
-
-  <div class="rates">
+  <!-- Rates Section -->
+  <div class="rates" id="rates">
     <h2>Rates</h2>
     <ul>
       <li><strong>Meet and Greet:</strong> Free</li>
@@ -187,23 +169,6 @@
       <li><strong>House Sitting:</strong> $65 for the first pet, +$20 per additional</li>
       <li><strong>Overnight & Puppy Care:</strong> $140/night</li>
     </ul>
-  </div>
-
-  <div class="contact">
-    <p>Text or call <a href="tel:3365251338">(336) 525-1338</a> or <a href="mailto:catdoggoose01@gmail.com">email us</a> to learn more.</p>
-  </div>
-
-  <div class="carousel-container">
-    <div class="carousel-track">
-      <img src="image1.jpg" alt="Pet 1" />
-      <img src="image2.jpeg" alt="Pet 2" />
-      <img src="image3.jpg" alt="Pet 3" />
-      <img src="image4.jpg" alt="Pet 4" />
-      <img src="image1.jpg" alt="Pet 1" />
-      <img src="image2.jpeg" alt="Pet 2" />
-      <img src="image3.jpg" alt="Pet 3" />
-      <img src="image4.jpg" alt="Pet 4" />
-    </div>
   </div>
 
   <footer>
