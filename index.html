@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cat Dog Goose - Pet Care</title>
   <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-HK5fgLBL+xzFtT6Bzp7l9DgRrUOR6LRyN3HvD4gObgVF+MoB6It0zGg3vXFXkYXPKn4O5x5qKoO+aO3y8NcJoA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     * {
       box-sizing: border-box;
@@ -25,24 +26,30 @@
       top: 0;
       left: 0;
       width: 100%;
-      background: white;
+      background: #ffffffee;
       border-bottom: 1px solid #ccc;
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1.2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 1000;
+      backdrop-filter: blur(6px);
     }
 
     .contact-info {
       font-size: 0.9rem;
       color: #333;
+      display: flex;
+      gap: 1.2rem;
+      align-items: center;
     }
 
     .contact-info a {
       text-decoration: none;
-      color: #3a6dcf;
-      margin-right: 1rem;
+      color: #264db5;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
 
     .nav-buttons a {
@@ -52,7 +59,7 @@
       font-weight: bold;
       background: #264db5;
       padding: 0.5rem 1rem;
-      border-radius: 5px;
+      border-radius: 6px;
       transition: background 0.3s;
     }
 
@@ -69,7 +76,7 @@
       height: auto;
     }
 
-    /* === Hero Section (optional) === */
+    /* === Hero Section === */
     .hero {
       background: #fff4ef;
       text-align: center;
@@ -112,6 +119,7 @@
       font-size: 1.1rem;
     }
 
+    /* === Footer === */
     footer {
       background: #5c8ed8;
       color: white;
@@ -120,6 +128,7 @@
       font-size: 0.9rem;
     }
 
+    /* === Mobile Responsive === */
     @media (max-width: 768px) {
       .top-bar {
         flex-direction: column;
@@ -142,8 +151,8 @@
   <!-- Fixed top bar -->
   <div class="top-bar">
     <div class="contact-info">
-      <a href="tel:3365251338">(336) 525-1338</a>
-      <a href="mailto:catdoggoose01@gmail.com">catdoggoose01@gmail.com</a>
+      <a href="tel:3365251338"><i class="fas fa-phone-alt"></i> (336) 525-1338</a>
+      <a href="mailto:catdoggoose01@gmail.com"><i class="fas fa-envelope"></i> catdoggoose01@gmail.com</a>
     </div>
     <div class="nav-buttons">
       <a href="#meetgreet">Meet & Greet</a>
@@ -155,10 +164,10 @@
   <!-- Header image -->
   <img src="webcatdoggoosev4.png" alt="Cat Dog Goose Banner" class="header-image" />
 
-  <!-- Optional Hero Section -->
+  <!-- Hero Section -->
   <div class="hero">
     <h2>Give Your Pets the Care They Deserve</h2>
-    <p>Personalized, professional pet sitting for your cats, dogs, and the occasional goose in Mebane and surrounding areas.</p>
+    <p>Personalized, professional pet sitting for your cats, dogs, and the occasional goose in Mebane, Hillsborough, and surrounding areas.</p>
   </div>
 
   <!-- Rates Section -->
@@ -172,6 +181,7 @@
     </ul>
   </div>
 
+  <!-- Footer -->
   <footer>
     &copy; 2025 Cat Dog Goose • Mebane, NC • All rights reserved.
   </footer>
