@@ -296,6 +296,24 @@
       transform: translateX(5px);
     }
 
+      @media (max-width: 480px) {
+    /* Increase bottom padding on rates section to avoid cropping */
+    .rates {
+      padding-bottom: 4rem; /* more space below */
+    }
+  
+    /* Add some margin bottom on last card */
+    .rate-card:last-child {
+      margin-bottom: 1rem;
+    }
+  
+    /* Ensure top margin is big enough to clear fixed bar */
+    .header-image {
+      margin-top: 80px; /* increase top margin for mobile if needed */
+    }
+  }
+
+
   </style>
 </head>
 <body>
