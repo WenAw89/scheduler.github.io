@@ -144,18 +144,14 @@ body {
 }
 
 .rate-grid {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
   max-width: 1100px;
   margin: 0 auto;
 }
 
 .rate-card {
-  flex: 1 1 0;
-  max-width: 33.333%;
-  min-width: 280px; /* optional: prevents too narrow cards on medium screens */
   background: #fff;
   border-radius: 12px;
   padding: 2rem;
@@ -165,6 +161,9 @@ body {
   animation: fadeIn 0.6s ease-in;
   cursor: pointer;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .rate-card:hover {
