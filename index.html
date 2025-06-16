@@ -80,16 +80,19 @@
     }
 
     .header-image {
-      margin-top: 0;
-      max-width: 100%;
-      display: block;
+      width: 100%;
+      max-width: 1000px;  /* bigger max width on desktop */
       height: auto;
-      width: 600px;
-      max-width: 90vw;
-      margin-left: auto;
-      margin-right: auto;
-      margin-bottom: 1rem;
+      display: block;
+      margin: 0 auto 1rem;
     }
+    
+    @media (max-width: 768px) {
+      .header-image {
+        max-width: 95vw; /* smaller on mobile */
+      }
+    }
+
 
     .hero {
       background: #fff4ef;
