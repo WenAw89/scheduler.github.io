@@ -84,15 +84,12 @@
     }
 
     .header-image {
-      margin-top: 70px;
-      max-width: 1000px;
-      width: 100%;
-      height: auto;
-      min-height: 200px;
+      width: 100vw;       /* Full viewport width */
+      height: auto;       /* Maintain aspect ratio */
+      max-width: none;    /* Remove max-width limiting it */
       display: block;
-      margin-left: auto;
-      margin-right: auto;
-      object-fit: contain;
+      margin: 70px auto 0 auto; /* Keep top margin for fixed top bar */
+      object-fit: cover;  /* This will fill width & crop vertically if needed */
     }
 
     /* Minimum height on small screens so it’s not too short */
