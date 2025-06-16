@@ -12,290 +12,253 @@
     referrerpolicy="no-referrer"
   />
   <style>
-    * {
-      box-sizing: border-box;
-    }
+ * {
+  box-sizing: border-box;
+}
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #fefefe;
-      color: #333;
-      line-height: 1.6;
-    }
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #fefefe;
+  color: #333;
+  line-height: 1.6;
+}
 
-    .top-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: #ffffffee;
-      border-bottom: 1px solid #ccc;
-      padding: 0.6rem 1.2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 1000;
-      backdrop-filter: blur(6px);
-      flex-wrap: wrap;
-    }
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #ffffffee;
+  border-bottom: 1px solid #ccc;
+  padding: 0.6rem 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(6px);
+  flex-wrap: wrap;
+}
 
-    .contact-info {
-      font-size: 0.9rem;
-      color: #333;
-      display: flex;
-      gap: 1.2rem;
-      align-items: center;
-      flex: 1 1 auto;
-      min-width: 220px;
-    }
+.contact-info {
+  font-size: 0.9rem;
+  color: #333;
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 220px;
+}
 
-    .contact-info a {
-      text-decoration: none;
-      color: #264db5;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
+.contact-info a {
+  text-decoration: none;
+  color: #264db5;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
 
-    .nav-buttons {
-      display: flex;
-      gap: 0.6rem;
-      flex: 1 1 auto;
-      justify-content: flex-end;
-      min-width: 180px;
-    }
+.nav-buttons {
+  display: flex;
+  gap: 0.6rem;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+  min-width: 180px;
+}
 
-    .nav-buttons a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      background: #264db5;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      transition: background 0.3s;
-      white-space: nowrap;
-      flex-shrink: 1; 
-      font-size: 0.9rem;
-    }
+.nav-buttons a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  background: #264db5;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: background 0.3s;
+  white-space: nowrap;
+  flex-shrink: 1;
+  font-size: 0.9rem;
+}
 
-    .nav-buttons a:hover {
-      background: #1e3f95;
-    }
+.nav-buttons a:hover {
+  background: #1e3f95;
+}
 
-    .header-image {
-      width: 100vw;       /* Full viewport width */
-      height: auto;       /* Maintain aspect ratio */
-      max-width: none;    /* Remove max-width limiting it */
-      display: block;
-      margin: 70px auto 0 auto; /* Keep top margin for fixed top bar */
-      object-fit: cover;  /* This will fill width & crop vertically if needed */
-    }
+.header-image {
+  width: 100vw;       /* Full viewport width */
+  height: auto;       /* Maintain aspect ratio */
+  max-width: none;    /* Remove max-width limiting it */
+  display: block;
+  margin: 70px auto 0 auto; /* Keep top margin for fixed top bar */
+  object-fit: cover;  /* This will fill width & crop vertically if needed */
+}
 
-    /* Minimum height on small screens so it’s not too short */
-    @media (max-width: 480px) {
-      .header-image {
-        min-height: 280px;
-      }
-    }
+/* Minimum height on small screens so it’s not too short */
+@media (max-width: 480px) {
+  .header-image {
+    min-height: 280px;
+    margin-top: 80px; /* moved here to fix CSS */
+  }
+}
 
-    .hero {
-      background: #fff4ef;
-      text-align: center;
-      padding: 3rem 1rem 2rem;
-    }
+.hero {
+  background: #fff4ef;
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+}
 
-    .hero h2 {
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
-    }
+.hero h2 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
 
-    .hero p {
-      max-width: 600px;
-      margin: 0 auto;
-      font-size: 1.1rem;
-    }
+.hero p {
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+}
 
-    .rates {
-      background: #f0f4fc;
-      padding: 3rem 1rem;
-      text-align: center;
-    }
+.rates {
+  background: #f0f4fc;
+  padding: 3rem 1rem;
+  text-align: center;
+}
 
-    .rates h2 {
-      font-size: 2rem;
-      margin-bottom: 2rem;
-      color: #264db5;
-    }
+.rates h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #264db5;
+}
 
-    .rate-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-      justify-content: center;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+.rate-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  max-width: 1100px;
+  margin: 0 auto;
+}
 
-    .rate-card {
-      flex: 1 1 300px;
-      max-width: 350px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      background: #fff;
-      border-radius: 12px;
-      padding: 2rem;
-      text-align: center;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      animation: fadeIn 0.6s ease-in;
-    }
-
-    .rate-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-    }
-
-    .rate-card h3 {
-      margin: 0 0 0.75rem;
-      font-size: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .rate-card i {
-      transition: transform 0.3s ease;
-    }
-
-    .rate-card:hover i {
-      transform: scale(1.2);
-    }
-
-    .rate-price {
-      font-weight: bold;
-      margin: 0.3rem 0;
-      font-size: 1.2rem;
-      color: #222;
-      transition: color 0.3s ease;
-    }
-
-    .rate-card:hover .rate-price {
-      color: #111;
-    }
-
-    .rate-desc {
-      font-size: 1rem;
-      color: #444;
-      margin-top: 1rem;
-      line-height: 1.6;
-      text-align: left;
-    }
-
-    /* Color-coded themes */
-    #meetgreet {
-      background-color: #e9f7ff;
-      border-left: 6px solid #3a99d8;
-    }
-
-    #dropin {
-      background-color: #fff4e9;
-      border-left: 6px solid #f28c38;
-    }
-
-    #housesit {
-      background-color: #f4f0ff;
-      border-left: 6px solid #7b6cd9;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    footer {
-      background: #5c8ed8;
-      color: white;
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-    }
-
-    /* Responsive tweaks */
-    @media (max-width: 768px) {
-      .top-bar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .nav-buttons {
-        margin-top: 0.5rem;
-        justify-content: flex-start;
-        width: 100%;
-      }
-      .nav-buttons a {
-        margin-left: 0;
-        margin-right: 0.5rem;
-        font-size: 1rem;
-        padding: 0.5rem 0.8rem;
-      }
-      .contact-info {
-        justify-content: flex-start;
-        width: 100%;
-        margin-bottom: 0.3rem;
-      }
-    }
-
-    /* Card link styling */
-    .card-link {
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      transition: transform 0.2s ease;
-    }
-
-    .card-link:hover {
-      transform: scale(1.02);
-    }
-
-    .rate-grid a.card-link {
-      flex: 1 1 300px;
-      max-width: 350px;
-      display: block;
-    }
-
-    .rate-card {
+.rate-card {
+  flex: 1 1 300px;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeIn 0.6s ease-in;
   cursor: pointer; /* indicate clickable card */
   position: relative;
 }
 
-    .book-hint {
-      margin-top: 1rem;
-      font-weight: 600;
-      color: #264db5;
-      font-size: 0.9rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.3rem;
-      user-select: none;
-    }
-    
-    .book-hint i {
-      transition: transform 0.3s ease;
-    }
-    
-    .rate-card:hover .book-hint i {
-      transform: translateX(5px);
-    }
+.rate-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.rate-card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.rate-card i {
+  transition: transform 0.3s ease;
+}
+
+.rate-card:hover i {
+  transform: scale(1.2);
+}
+
+.rate-price {
+  font-weight: bold;
+  margin: 0.3rem 0;
+  font-size: 1.2rem;
+  color: #222;
+  transition: color 0.3s ease;
+}
+
+.rate-card:hover .rate-price {
+  color: #111;
+}
+
+.rate-desc {
+  font-size: 1rem;
+  color: #444;
+  margin-top: 1rem;
+  line-height: 1.6;
+  text-align: left;
+}
+
+/* Color-coded themes */
+#meetgreet {
+  background-color: #e9f7ff;
+  border-left: 6px solid #3a99d8;
+}
+
+#dropin {
+  background-color: #fff4e9;
+  border-left: 6px solid #f28c38;
+}
+
+#housesit {
+  background-color: #f4f0ff;
+  border-left: 6px solid #7b6cd9;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+footer {
+  background: #5c8ed8;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .nav-buttons {
+    margin-top: 0.5rem;
+    justify-content: flex-start;
+    width: 100%;
+    flex-wrap: wrap; /* allow buttons to wrap */
+    gap: 0.5rem;
+  }
+  .nav-buttons a {
+    margin-left: 0;
+    margin-right: 0.5rem;
+    font-size: 1rem;
+    padding: 0.5rem 0.8rem;
+    white-space: nowrap;
+  }
+  .contact-info {
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 0.3rem;
+  }
+}
 
 @media (max-width: 480px) {
   /* Stack the cards vertically on small screens */
@@ -317,17 +280,16 @@
     padding-bottom: 4rem;
   }
 
-  /* Increase top margin of header image to clear fixed nav bar */
-  .header-image {
-    margin-top: 80px;
-
+  /* Stack nav buttons vertically and full width */
   .nav-buttons {
     flex-direction: column;
     width: 100%;
+    gap: 0.3rem;
   }
   .nav-buttons a {
     width: 100%;
     margin: 0 0 0.5rem 0;
+    white-space: normal;
   }
 }
 
