@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pet Booking</title>
+  <style>
+    :root {
+      --primary: #007aff;
+      --secondary: #f0f8ff;
+      --accent: #28a745;
+      --disabled: #ccc;
+      --text-dark: #222;
+      --bg-light: #f9f9fb;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0 auto;
+      padding: 1rem;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      max-width: 700px;
+      position: relative;
+      min-height: 100vh;
+    }
+    h2, h3, h4 {
+      text-align: center;
+      margin-top: 1.2rem;
+    }
+    .calendar, .timeslots, .form-container {
+      margin-top: 1rem;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 0.5rem;
+    }
+    .calendar-header div {
+      font-weight: bold;
+      text-align: center;
+    }
+    .day {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background 0.2s ease;
+    }
+    .day:hover {
+      background-color: var(--secondary);
+    }
+    .day.selected {
+      background-color: var(--primary);
+      color: white;
+      font-weight: bold;
+    }
+    .day.disabled {
+      background-color: #eee;
+      color: #aaa;
+      pointer-events: none;
+    }
+    .nav-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    .nav-button {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      color: var(--primary);
+      cursor: pointer;
+    }
+    .month-label {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    button {
+      display: block;
+      width: 100%;
+      margin: 1.5rem 0 0.5rem;
+      padding: 0.8rem;
+      font-size: 1rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .timeslot-section {
+      margin-top: 1.5rem;
+    }
+    .timeslot-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .timeslot {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #fff;
+      cursor: pointer;
+      user-select: none;
+    }
+    .timeslot:hover {
+      background-color: var(--secondary);
+    }
+    .timeslot.selected {
+      background-color: var(--accent);
+      color: white;
+    }
+    .timeslot.disabled {
+      background-color: var(--disabled);
+      color: #777;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    input, textarea {
+      padding: 0.6rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 100%;
+    }
+    textarea {
+      resize: vertical;
+    }
+    .hidden {
+      display: none;
+    }
+
+    /* Spinner styles */
+    #loadingSpinner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid var(--primary);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      animation: spin 1s linear infinite;
+      z-index: 9999;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg);}
+      100% { transform: translate(-50%, -50%) rotate(360deg);}
+    }
+  </style>
+</head>
+<body>
+  <h2>Schedule a Meet & Greet</h2>
+
+  <!-- Spinner shown while loading -->
+  <div id="loadingSpinner"></div>
+
+  <div id="calendar" class="calendar"></div>
+  <button id="toTimeSlots" class="hidden">Next: Select Times</button>
+
+  <div id="timeslots" class="timeslots hidden">
+    <h2>Select Time Slots</h2>
+    <div id="timeslotSections"></div>
+    <button id="toForm">Next: Contact Info</button>
+  </div>
+
+  <form id="bookingForm" class="form-container hidden">
+    <h2>Contact Info</h2>
+    <input id="name" type="text" placeholder="Full Name *" required />
+    <input id="email" type="email" placeholder="Email *" required />
+    <input id="phone" type="tel" placeholder="Phone Number *" required />
+    <input id="address" type="text" placeholder="Address *" required />
+    <textarea id="pets" rows="4" placeholder="Tell me about your pets, e.g. 1 dog, 2 cats, 3 goose"></textarea>
+    <textarea id="summary" rows="4" readonly></textarea>
+    <button type="submit">Submit Booking</button>
+  </form>
+
+<script>
+  const calendar = document.getElementById('calendar');
+  const toTimeSlotsBtn = document.getElementById('toTimeSlots');
+  const timeslotsDiv = document.getElementById('timeslots');
+  const timeslotSections = document.getElementById('timeslotSections');
+  const toFormBtn = document.getElementById('toForm');
+  const bookingForm = document.getElementById('bookingForm');
+  const summary = document.getElementById('summary');
+  const loadingSpinner = document.getElementById('loadingSpinner');
+
+  // Your Google Apps Script URL for GET to fetch existing bookings
+  const getBookingsURL = 'https://script.google.com/macros/s/AKfycby5owg8ekTOG9YlaxBhzHTuebKc9q_05z2OU5uvSSII2S2LlqKg-rpX_q623F1eG_4qeg/exec';
+
+  let selectedDates = new Set();
+  let selectedTimes = {};
+  let currentYear, currentMonth;
+  let bookedSlots = {};  // { "YYYY-MM-DD": ["07:00", "07:30", ...], ... }
+
+  function generateCalendar(year, month) {
+    currentYear = year;
+    currentMonth = month;
+    calendar.innerHTML = '';
+
+    const nav = document.createElement('div');
+    nav.className = 'nav-wrapper';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.textContent = '←';
+    prevBtn.className = 'nav-button';
+    prevBtn.onclick = () => {
+      let newMonth = currentMonth - 1;
+      let newYear = currentYear;
+      if (newMonth < 0) {
+        newMonth = 11;
+        newYear--;
+      }
+      generateCalendar(newYear, newMonth);
+    };
+
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = '→';
+    nextBtn.className = 'nav-button';
+    nextBtn.onclick = () => {
+      let newMonth = currentMonth + 1;
+      let newYear = currentYear;
+      if (newMonth > 11) {
+        newMonth = 0;
+        newYear++;
+      }
+      generateCalendar(newYear, newMonth);
+    };
+
+    const title = document.createElement('div');
+    title.className = 'month-label';
+    title.textContent = new Date(year, month).toLocaleString('default', {
+      month: 'long',
+      year: 'numeric',
+    });
+
+    nav.appendChild(prevBtn);
+    nav.appendChild(title);
+    nav.appendChild(nextBtn);
+    calendar.appendChild(nav);
+
+    const grid = document.createElement('div');
+    grid.className = 'calendar-grid';
+
+    const headers = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    headers.forEach(h => {
+      const el = document.createElement('div');
+      el.className = 'calendar-header';
+      el.textContent = h;
+      grid.appendChild(el);
+    });
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const startDay = new Date(year, month, 1).getDay();
+    const now = new Date();
+    const buffer = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24-hour buffer
+
+    for (let i = 0; i < startDay; i++) {
+      grid.appendChild(document.createElement('div'));
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const dateStr = date.toISOString().split('T')[0];
+      const day = document.createElement('div');
+      day.className = 'day';
+      day.textContent = d;
+
+      if (date < buffer) {
+        day.classList.add('disabled');
+      } else {
+        if (selectedDates.has(dateStr)) day.classList.add('selected');
+        day.onclick = () => {
+          if (selectedDates.has(dateStr)) {
+            selectedDates.delete(dateStr);
+            day.classList.remove('selected');
+            delete selectedTimes[dateStr];
+          } else {
+            selectedDates.add(dateStr);
+            day.classList.add('selected');
+          }
+          // Show or hide Next button depending on selection
+          if (selectedDates.size > 0) {
+            toTimeSlotsBtn.classList.remove('hidden');
+          } else {
+            toTimeSlotsBtn.classList.add('hidden');
+          }
+        };
+      }
+
+      grid.appendChild(day);
+    }
+
+    calendar.appendChild(grid);
+  }
+
+  function generateTimeBlocks() {
+    const blocks = [];
+    for (let hour = 7; hour < 20; hour++) {
+      blocks.push(`${String(hour).padStart(2, '0')}:00`);
+      blocks.push(`${String(hour).padStart(2, '0')}:30`);
+    }
+    return blocks;
+  }
+
+  function renderTimeSlots() {
+    timeslotSections.innerHTML = '';
+    selectedDates.forEach(date => {
+      const section = document.createElement('div');
+      section.className = 'timeslot-section';
+      const title = document.createElement('h4');
+      title.textContent = `Time slots for ${date}`;
+      section.appendChild(title);
+
+      const list = document.createElement('div');
+      list.className = 'timeslot-list';
+      const blocks = generateTimeBlocks();
+      selectedTimes[date] = selectedTimes[date] || [];
+
+      blocks.forEach(time => {
+        const btn = document.createElement('div');
+        btn.className = 'timeslot';
+        btn.textContent = time;
+
+        // Disable if already booked
+        if (bookedSlots[date] && bookedSlots[date].includes(time)) {
+          btn.classList.add('disabled');
+        } else {
+          // Toggle selection on click
+          if (selectedTimes[date].includes(time)) btn.classList.add('selected');
+          btn.onclick = () => {
+            const i = selectedTimes[date].indexOf(time);
+            if (i > -1) {
+              selectedTimes[date].splice(i, 1);
+              btn.classList.remove('selected');
+            } else {
+              selectedTimes[date].push(time);
+              btn.classList.add('selected');
+            }
+          };
+        }
+        list.appendChild(btn);
+      });
+
+      section.appendChild(list);
+      timeslotSections.appendChild(section);
+    });
+  }
+
+  toTimeSlotsBtn.onclick = () => {
+    if (selectedDates.size === 0) return alert('Please select at least one date.');
+    calendar.classList.add('hidden');
+    toTimeSlotsBtn.classList.add('hidden');
+    timeslotsDiv.classList.remove('hidden');
+    renderTimeSlots();
+  };
+
+  toFormBtn.onclick = () => {
+    let summaryText = '';
+    for (let date of selectedDates) {
+      if (!selectedTimes[date] || selectedTimes[date].length === 0) {
+        alert(`Please select at least one time for ${date}`);
+        return;
+      }
+      summaryText += `${date}: ${selectedTimes[date].join(', ')}\n`;
+    }
+    timeslotsDiv.classList.add('hidden');
+    bookingForm.classList.remove('hidden');
+    summary.value = summaryText;
+  };
+
+  bookingForm.onsubmit = (e) => {
+    e.preventDefault();
+
+    const data = {
+      name: document.getElementById('name').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      address: document.getElementById('address').value.trim(),
+      pets: document.getElementById('pets').value.trim(),
+      summary: summary.value.trim(),
+    };
+
+    fetch('https://script.google.com/macros/s/AKfycby5owg8ekTOG9YlaxBhzHTuebKc9q_05z2OU5uvSSII2S2LlqKg-rpX_q623F1eG_4qeg/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      mode: 'no-cors',
+      body: JSON.stringify(data)
+    })
+    .then(() => {
+      alert('Booking submitted successfully! You’ll receive an email confirmation once your reservation is reviewed and confirmed.');
+      window.location.href = 'https://catdoggoose.com';
+    })
+    .catch((err) => {
+      console.error('Submission error:', err);
+      alert('There was an error submitting the form. Please try again.');
+    });
+  };
+
+  // Show spinner and fetch booked slots on load
+  loadingSpinner.style.display = 'block';
+  fetch(getBookingsURL)
+    .then(res => res.json())
+    .then(data => {
+      bookedSlots = data || {};
+      // Initialize calendar with current month
+      const today = new Date();
+      generateCalendar(today.getFullYear(), today.getMonth());
+    })
+    .catch(err => {
+      console.error('Error fetching booked slots:', err);
+      // Still generate calendar even if fetch fails
+      const today = new Date();
+      generateCalendar(today.getFullYear(), today.getMonth());
+    })
+    .finally(() => {
+      loadingSpinner.style.display = 'none';
+    });
+</script>
+</body>
+</html>
