@@ -108,26 +108,32 @@
     }
     
     .rate-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
       gap: 2rem;
+      justify-content: center;
       max-width: 1100px;
       margin: 0 auto;
     }
     
     .rate-card {
-      background: #fff;
-      border-left: 8px solid #264db5;
-      border-radius: 16px;
-      padding: 2rem;
+      flex: 1 1 300px;
+      min-width: 280px;
+      max-width: 350px;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      justify-content: flex-start;
+      background: #fff;
+      border-left: 6px solid #264db5;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       animation: fadeIn 0.6s ease-in;
       height: 100%;
     }
+
     
     .rate-card:nth-child(1) {
       background-color: #f0f8ff;
