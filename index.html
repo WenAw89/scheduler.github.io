@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cat Dog Goose - Pet Care</title>
   <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-HK5fgLBL+xzFtT6Bzp7l9DgRrUOR6LRyN3HvD4gObgVF+MoB6It0zGg3vXFXkYXPKn4O5x5qKoO+aO3y8NcJoA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     * {
       box-sizing: border-box;
@@ -20,7 +20,6 @@
       line-height: 1.6;
     }
 
-    /* === Fixed Top Bar === */
     .top-bar {
       position: fixed;
       top: 0;
@@ -67,16 +66,13 @@
       background: #1e3f95;
     }
 
-    /* === Logo Image === */
     .header-image {
-      margin-top: 70px; /* space below fixed top bar */
+      margin-top: 70px;
       max-width: 100%;
-      width: 100%;
       display: block;
       height: auto;
     }
 
-    /* === Hero Section === */
     .hero {
       background: #fff4ef;
       text-align: center;
@@ -94,19 +90,18 @@
       font-size: 1.1rem;
     }
 
-    /* === Rates Section === */
     .rates {
       background: #f0f4fc;
       padding: 3rem 1rem;
       text-align: center;
     }
-    
+
     .rates h2 {
       font-size: 2rem;
       margin-bottom: 2rem;
       color: #264db5;
     }
-    
+
     .rate-grid {
       display: flex;
       flex-wrap: wrap;
@@ -115,63 +110,56 @@
       max-width: 1100px;
       margin: 0 auto;
     }
-    
+
     .rate-card {
       flex: 1 1 300px;
-      min-width: 280px;
       max-width: 350px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       background: #fff;
-      border-left: 6px solid #264db5;
       border-radius: 12px;
       padding: 2rem;
       text-align: center;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       animation: fadeIn 0.6s ease-in;
-      height: 100%;
     }
 
-    
-    .rate-card:nth-child(1) {
-      background-color: #f0f8ff;
-      border-left-color: #5a9bd8;
-    }
-    .rate-card:nth-child(2) {
-      background-color: #fff7f0;
-      border-left-color: #f28c38;
-    }
-    .rate-card:nth-child(3) {
-      background-color: #f5f5fc;
-      border-left-color: #7b6cd9;
-    }
-    
     .rate-card:hover {
       transform: translateY(-6px);
       box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
     }
-    
+
     .rate-card h3 {
-      color: #264db5;
-      margin-top: 0;
-      margin-bottom: 0.75rem;
+      margin: 0 0 0.75rem;
       font-size: 1.5rem;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 0.5rem;
-      align-self: center;
     }
-    
+
+    .rate-card i {
+      transition: transform 0.3s ease;
+    }
+
+    .rate-card:hover i {
+      transform: scale(1.2);
+    }
+
     .rate-price {
       font-weight: bold;
-      color: #222;
       margin: 0.3rem 0;
-      font-size: 1.1rem;
-      align-self: center;
+      font-size: 1.2rem;
+      color: #222;
+      transition: color 0.3s ease;
     }
-    
+
+    .rate-card:hover .rate-price {
+      color: #111;
+    }
+
     .rate-desc {
       font-size: 1rem;
       color: #444;
@@ -179,20 +167,28 @@
       line-height: 1.6;
       text-align: left;
     }
-    
+
+    /* Color-coded themes */
+    #meetgreet {
+      background-color: #e9f7ff;
+      border-left: 6px solid #3a99d8;
+    }
+
+    #dropin {
+      background-color: #fff4e9;
+      border-left: 6px solid #f28c38;
+    }
+
+    #housesit {
+      background-color: #f4f0ff;
+      border-left: 6px solid #7b6cd9;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
-    @media (max-width: 768px) {
-      .rate-card {
-        padding: 1.5rem;
-      }
-    }
 
-
-    /* === Footer === */
     footer {
       background: #5c8ed8;
       color: white;
@@ -201,17 +197,14 @@
       font-size: 0.9rem;
     }
 
-    /* === Mobile Responsive === */
     @media (max-width: 768px) {
       .top-bar {
         flex-direction: column;
         align-items: flex-start;
       }
-
       .nav-buttons {
         margin-top: 0.5rem;
       }
-
       .nav-buttons a {
         margin-left: 0;
         margin-right: 0.5rem;
@@ -243,37 +236,45 @@
     <p>Personalized, professional pet sitting for your cats, dogs, and the occasional goose and chickens in Mebane, Hillsborough, and surrounding areas.</p>
   </div>
 
-<div class="rate-card">
-  <h3><i class="fas fa-handshake"></i> Meet & Greet</h3>
-  <p class="rate-price">Free</p>
-  <p class="rate-desc">
-    A complimentary visit to meet your pets, review care needs, and make sure we’re all a great fit.
-  </p>
-</div>
+  <!-- Rates Section -->
+  <section class="rates" id="rates">
+    <h2>Rates & Services</h2>
+    <div class="rate-grid">
 
-<div class="rate-card">
-  <h3><i class="fas fa-paw"></i> Drop-In Visits</h3>
-  <p class="rate-price">$25 • 30 min</p>
-  <p class="rate-price">$50 • 60 min</p>
-  <p class="rate-desc">
-    Each visit includes potty breaks, playtime or a walk, feeding, and plenty of love and attention.<br>
-    You'll receive adorable photos and a visit recap to stay connected while you're away!<br>
-    <strong>+$10</strong> per extra dog • <strong>+$5</strong> per additional cat or bird family
-  </p>
-</div>
+      <div class="rate-card" id="meetgreet">
+        <h3><i class="fas fa-handshake"></i> Meet & Greet</h3>
+        <p class="rate-price">Free</p>
+        <p class="rate-desc">
+          A complimentary visit to meet your pets, review care needs, and make sure we’re all a great fit.
+        </p>
+      </div>
 
-<div class="rate-card">
-  <h3><i class="fas fa-home"></i> House Sitting & Overnight Care</h3>
-  <p class="rate-price">$65 • Standard Overnight</p>
-  <p class="rate-price">$140 • Extended Overnight & Puppy Care</p>
-  <p class="rate-desc">
-    Cozy overnight stays to keep your pets comfortable and your home safe.<br>
-    Every visit includes mail/package pickup, plant watering, and home checks.<br>
-    <strong>Standard:</strong> Evening to morning care with snuggles, feeding, and routines.<br>
-    <strong>Extended:</strong> Longer hours, extra potty breaks, and more one-on-one time — perfect for puppies or seniors.<br>
-    <strong>+$20</strong> per additional pet
-  </p>
-</div>
+      <div class="rate-card" id="dropin">
+        <h3><i class="fas fa-paw"></i> Drop-In Visits</h3>
+        <p class="rate-price">$25 • 30 min</p>
+        <p class="rate-price">$50 • 60 min</p>
+        <p class="rate-desc">
+          Each visit includes potty breaks, playtime or a walk, feeding, and plenty of love and attention.<br>
+          You'll receive adorable photos and a visit recap to stay connected while you're away!<br>
+          <strong>+$10</strong> per extra dog • <strong>+$5</strong> per additional cat or bird family
+        </p>
+      </div>
+
+      <div class="rate-card" id="housesit">
+        <h3><i class="fas fa-home"></i> House Sitting & Overnight Care</h3>
+        <p class="rate-price">$65 • Standard Overnight</p>
+        <p class="rate-price">$140 • Extended Overnight & Puppy Care</p>
+        <p class="rate-desc">
+          Cozy overnight stays to keep your pets comfortable and your home safe.<br>
+          Every visit includes mail/package pickup, plant watering, and home checks.<br>
+          <strong>Standard:</strong> Evening to morning care with snuggles, feeding, and routines.<br>
+          <strong>Extended:</strong> Longer hours, extra potty breaks, and more one-on-one time — perfect for puppies or seniors.<br>
+          <strong>+$20</strong> per additional pet
+        </p>
+      </div>
+
+    </div>
+  </section>
 
   <!-- Footer -->
   <footer>
