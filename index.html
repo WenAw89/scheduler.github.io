@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- AOS Animation Stylesheet -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cat Dog Goose - Pet Care</title>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fefefe;
+      color: #333;
+      line-height: 1.6;
+      padding-top: 56px;
+    }
+
+    @media (max-width: 768px) {
+      body { padding-top: 100px; }
+    }
+
+    @media (max-width: 480px) {
+      body { padding-top: 250px; }
+    }
+
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #ffffffee;
+      border-bottom: 1px solid #ccc;
+      padding: 0.6rem 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(6px);
+      flex-wrap: wrap;
+    }
+
+    .contact-info {
+      font-size: 0.9rem;
+      color: #333;
+      display: flex;
+      gap: 1.2rem;
+      align-items: center;
+      flex: 1 1 auto;
+      min-width: 220px;
+    }
+
+    .contact-info a {
+      text-decoration: none;
+      color: #264db5;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0.6rem;
+      flex: 1 1 auto;
+      justify-content: flex-end;
+      min-width: 180px;
+    }
+
+    .nav-buttons a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      background: #264db5;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: background 0.3s;
+      white-space: nowrap;
+      flex-shrink: 1;
+      font-size: 0.9rem;
+    }
+
+    .nav-buttons a:hover {
+      background: #1e3f95;
+    }
+
+    .header-image {
+      width: 100vw;
+      height: auto;
+      max-width: none;
+      display: block;
+      margin: 0 auto 0 auto;
+      object-fit: cover;
+    }
+
+    @media (max-width: 480px) {
+      .header-image { min-height: 280px; }
+    }
+
+    .hero {
+      background: #fff4ef;
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+    }
+
+    .hero h2 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+    }
+
+    .rates {
+      background: #f0f4fc;
+      padding: 3rem 1rem;
+      text-align: center;
+    }
+
+    .rates h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: #264db5;
+    }
+
+.rate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+.rate-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeIn 0.6s ease-in;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* ✅ Add this line */
+}
+
+    .rate-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .rate-card h3 {
+      margin: 0 0 0.75rem;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .rate-card i {
+      transition: transform 0.3s ease;
+    }
+
+    .rate-card:hover i {
+      transform: scale(1.2);
+    }
+
+    .rate-price {
+      font-weight: bold;
+      margin: 0.3rem 0;
+      font-size: 1.2rem;
+      color: #222;
+      transition: color 0.3s ease;
+    }
+
+    .rate-card:hover .rate-price {
+      color: #111;
+    }
+
+    .rate-desc {
+      font-size: 1rem;
+      color: #444;
+      margin-top: 1rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .book-hint {
+      margin-top: auto;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    #meetgreet { background-color: #e9f7ff; border-left: 6px solid #3a99d8; }
+    #dropin    { background-color: #fff4e9; border-left: 6px solid #f28c38; }
+    #housesit  { background-color: #f4f0ff; border-left: 6px solid #7b6cd9; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      background: #5c8ed8;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .nav-buttons {
+        margin-top: 0.5rem;
+        justify-content: flex-start;
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .nav-buttons a {
+        margin-left: 0;
+        margin-right: 0.5rem;
+        font-size: 1rem;
+        padding: 0.5rem 0.8rem;
+        white-space: nowrap;
+      }
+      .contact-info {
+        justify-content: flex-start;
+        width: 100%;
+        margin-bottom: 0.3rem;
+      }
+      .rate-grid {
+        grid-template-columns: 1fr;
+      }
+     }
+
+    @media (max-width: 480px) {
+      .rate-grid {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .rate-grid a.card-link {
+        flex: none;
+        max-width: 90vw;
+        width: 100%;
+        margin-bottom: 1.5rem;
+      }
+
+      .rates {
+        padding-bottom: 4rem;
+      }
+
+      .nav-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.6rem;
+        padding: 0 0.5rem;
+      }
+      .nav-buttons a {
+        width: 100%;
+        margin: 0;
+        padding: 0.75rem 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(38, 77, 181, 0.3);
+        text-align: center;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      .nav-buttons a:hover,
+      .nav-buttons a:focus {
+        background: #1e3f95;
+        box-shadow: 0 6px 12px rgba(30, 63, 149, 0.6);
+        outline: none;
+      }
+    }
+
+    .card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .card-link:hover,
+    .card-link:focus {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .gallery {
+      padding: 3rem 1rem;
+      background: #fffaf5;
+      text-align: center;
+    }
+    
+    .gallery h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: #264db5;
+    }
+    
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    
+    /* Force all images to a uniform shape */
+    .gallery-grid img {
+      width: 100%;
+      aspect-ratio: 1 / 1;        /* or 4 / 3 for landscape */
+      object-fit: cover;          /* crops edges if needed */
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    /* Add animation on scroll or hover */
+    .gallery-grid img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+
+    
+  </style>
+</head>
+<!-- AOS Animation Script -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>
+
+<body>
+  <div class="top-bar">
+    <div class="contact-info">
+      <a href="tel:3365251338"><i class="fas fa-phone-alt"></i> (336) 525-1338</a>
+      <a href="mailto:catdoggoose01@gmail.com"><i class="fas fa-envelope"></i> catdoggoose01@gmail.com</a>
+    </div>
+    <div class="nav-buttons">
+      <a href="meetgreet.html">Meet & Greet</a>
+      <a href="dropin.html">Drop‑In Visits</a>
+      <a href="housesit.html">House Sitting</a>
+    </div>
+  </div>
+
+  <picture>
+    <source media="(max-width: 480px)" srcset="webcatdoggoose-mobile.png" />
+    <source media="(min-width: 481px)" srcset="webcatdoggoosev4.png" />
+    <img src="webcatdoggoosev4.png" alt="Cat Dog Goose Banner" class="header-image" />
+  </picture>
+
+  <div class="hero">
+    <h2>Give Your Pets the Care They Deserve</h2>
+    <p>Personalized pet sitting for your cats, dogs, and the occasional goose and chickens in Mebane, Hillsborough, and surrounding areas.</p>
+  </div>
+
+<section class="rates" id="rates">
+  <h2>Rates & Services</h2>
+  <div class="rate-grid">
+    <a href="meetgreet.html" class="card-link">
+      <div class="rate-card" style="background-color: #f0f8ff; border-left-color: #5a9bd8">
+        <h3><i class="fas fa-handshake"></i> Meet & Greet</h3>
+        <p class="rate-price">Free</p>
+        <p class="rate-desc">A complimentary initial visit to meet your pets and go over care instructions, routines, and home logistics.</p>
+        <p class="book-hint">Click to Book <i class="fas fa-arrow-right"></i></p>
+      </div>
+    </a>
+
+    <a href="dropin.html" class="card-link">
+      <div class="rate-card" style="background-color: #fff7f0; border-left-color: #f28c38">
+        <h3><i class="fas fa-paw"></i> Drop-In Visits</h3>
+        <p class="rate-price">$25 • 30 min</p>
+        <p class="rate-price">$50 • 60 min</p>
+        <p class="rate-desc">Each visit includes potty breaks, playtime or a walk, feeding, and plenty of love and attention. You'll receive photos and a visit recap to stay connected while you're away!</p>
+        <p class="rate-desc"><strong>+$10</strong> per additional dog • <strong>+$5</strong> per additional cat or bird family</p>
+        <p class="book-hint">Click to Book <i class="fas fa-arrow-right"></i></p>
+      </div>
+    </a>
+
+    <a href="housesit.html" class="card-link">
+      <div class="rate-card" style="background-color: #f5f5fc; border-left-color: #7b6cd9">
+        <h3><i class="fas fa-home"></i> House Sitting & Overnight Care</h3>
+        <p class="rate-price">$65 • Standard Overnight</p>
+        <p class="rate-price">$140 • Extended & Puppy Care</p>
+        <p>Both options provide in-home overnight care to keep your pets comfortable and your home secure.<br /><strong>Standard:</strong> Evening to morning care.<br /><strong>Extended:</strong> Ideal for puppies/senior pets.<br /><strong>+$20</strong> per additional pet</p>
+        <p class="book-hint">Click to Book <i class="fas fa-arrow-right"></i></p>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section class="gallery-section">
+  <h2>Gallery</h2>
+  <div class="gallery-grid">
+    <img src="img1.jpg" alt="Pet 1" data-aos="fade-up" />
+    <img src="img2.jpg" alt="Pet 2" data-aos="zoom-in" />
+    <img src="img3.jpg" alt="Pet 3" data-aos="fade-left" />
+    <img src="img4.jpg" alt="Pet 4" data-aos="flip-up" />
+    <img src="img5.jpg" alt="Pet 5" data-aos="zoom-out-up" />
+  </div>
+</section>
+
+
+  <footer>&copy; 2025 Cat Dog Goose • Mebane, NC • All rights reserved.</footer>
+</body>
+</html>
