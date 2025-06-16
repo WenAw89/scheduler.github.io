@@ -290,11 +290,12 @@
   </div>
 
   <!-- Header image -->
-  <img
-    src="webcatdoggoosev4.png"
-    alt="Cat Dog Goose Banner"
-    class="header-image"
-  />
+<picture>
+  <source media="(max-width: 480px)" srcset="webcatdoggoose-mobile.png" />
+  <source media="(min-width: 481px)" srcset="webcatdoggoosev4.png" />
+  <img src="webcatdoggoosev4.png" alt="Cat Dog Goose Banner" class="header-image" />
+</picture>
+
 
   <!-- Hero Section -->
   <div class="hero">
