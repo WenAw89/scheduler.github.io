@@ -95,58 +95,76 @@
     }
 
     /* === Rates Section === */
-  .rates {
-  background: #f0f4fc;
-  padding: 3rem 1rem;
-  text-align: center;
-}
-
-.rates h2 {
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  color: #264db5;
-}
-
-.rate-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.rate-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  text-align: left;
-}
-
-.rate-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-}
-
-.rate-card h3 {
-  color: #264db5;
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  font-size: 1.3rem;
-}
-
-.rate-price {
-  font-weight: bold;
-  color: #222;
-  margin: 0.3rem 0;
-}
-
-.rate-desc {
-  font-size: 1rem;
-  color: #444;
-  margin-top: 0.75rem;
-}
+    .rates {
+      background: #f0f4fc;
+      padding: 3rem 1rem;
+      text-align: center;
+    }
+    
+    .rates h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: #264db5;
+    }
+    
+    .rate-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    
+    .rate-card {
+      background: #fff;
+      border-left: 6px solid #264db5;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: left;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeIn 0.6s ease-in;
+    }
+    
+    .rate-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+    
+    .rate-card h3 {
+      color: #264db5;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .rate-price {
+      font-weight: bold;
+      color: #222;
+      margin: 0.3rem 0;
+      font-size: 1.05rem;
+    }
+    
+    .rate-desc {
+      font-size: 1rem;
+      color: #444;
+      margin-top: 0.75rem;
+      line-height: 1.5;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @media (max-width: 768px) {
+      .rate-card {
+        padding: 1.5rem;
+      }
+    }
 
 
     /* === Footer === */
@@ -205,41 +223,38 @@
   <div class="rate-grid">
 
     <div class="rate-card">
-      <h3>Meet & Greet</h3>
+      <h3><i class="fas fa-handshake"></i> Meet & Greet</h3>
       <p class="rate-price">Free</p>
       <p class="rate-desc">
-        A complimentary initial visit to meet your pets and go over care instructions and home logistics.
+        A complimentary initial visit to meet your pets and go over care instructions, routines, and home logistics.
       </p>
     </div>
 
     <div class="rate-card">
-      <h3>Drop-In Visits</h3>
+      <h3><i class="fas fa-paw"></i> Drop-In Visits</h3>
       <p class="rate-price">$25 • 30 min</p>
       <p class="rate-price">$50 • 60 min</p>
       <p class="rate-desc">
-        Includes feeding, playtime, potty breaks, and affection. Photos and a visit summary provided.<br>
+        Includes potty breaks, playtime, feeding, and companionship. Photos and a detailed visit report provided.<br>
         +$10 per additional dog • +$5 per additional cat
       </p>
     </div>
 
     <div class="rate-card">
-      <h3>House Sitting</h3>
-      <p class="rate-price">$65 • per night</p>
+      <h3><i class="fas fa-home"></i> House Sitting & Extended Overnight</h3>
+      <p class="rate-price">$65 • Standard Overnight</p>
+      <p class="rate-price">$140 • Extended Overnight & Puppy Care</p>
       <p class="rate-desc">
-        In-home overnight care with attention to your pet's needs and your home's safety.<br>
-        Mail/package collection and lock check included.<br>
+        Both options provide in-home overnight care to keep your pets comfortable and your home secure.<br>
+        <strong>Standard:</strong> Evening to morning stay with feeding, attention, and routine checks.<br>
+        <strong>Extended:</strong> Ideal for puppies or senior pets needing extra care, with longer hours, more potty breaks, and closer supervision.<br>
+        Includes mail/package pickup and double-checking locks.<br>
         +$20 per additional pet
       </p>
     </div>
 
-    <div class="rate-card">
-      <h3>Extended Overnight & Puppy Care</h3>
-      <p class="rate-price">$140 • per night</p>
-      <p class="rate-desc">
-        Designed for puppies, seniors, or pets needing extra attention. Extra long overnight stay, multiple potty breaks, and supervision.<br>
-        +$20 per additional pet
-      </p>
-    </div>
+  </div>
+</div>
 
   </div>
 </div>
