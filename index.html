@@ -35,43 +35,45 @@
       backdrop-filter: blur(6px);
     }
 
-    .contact-info {
-      font-size: 0.9rem;
-      color: #333;
-      display: flex;
-      gap: 1.2rem;
-      align-items: center;
-    }
+@media (max-width: 768px) {
+  .top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+  }
 
-    .contact-info a {
-      text-decoration: none;
-      color: #264db5;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
+  .contact-info {
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
 
-    .nav-buttons a {
-      color: white;
-      margin-left: 0.75rem;
-      text-decoration: none;
-      font-weight: bold;
-      background: #264db5;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      transition: background 0.3s;
-    }
+  .nav-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0;
+    width: 100%;
+  }
 
-    .nav-buttons a:hover {
-      background: #1e3f95;
-    }
+  .nav-buttons a {
+    flex: 1 1 auto;
+    min-width: 120px;
+    text-align: center;
+    font-size: 0.9rem;
+    padding: 0.45rem 0.75rem;
+    margin: 0; /* remove margin-left */
+    border-radius: 5px;
+  }
 
-    .header-image {
-      margin-top: 70px;
-      max-width: 100%;
-      display: block;
-      height: auto;
-    }
+  .header-image {
+    width: 90vw;  /* make image fill most of viewport width */
+    height: auto;
+    margin-top: 80px; /* keep space below fixed top bar */
+    max-width: none; /* override max-width: 100% */
+  }
+}
 
     .hero {
       background: #fff4ef;
