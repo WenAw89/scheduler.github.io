@@ -322,13 +322,19 @@
     
     .gallery-grid {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
       width: 100%
       max-width: none;
       margin: 0 auto;
       padding: 0 1rem;
     }
+  
+    @media (min-width: 768px) {
+    .gallery-grid {
+    grid-template-columns: repeat(6, 1fr); /* Desktop = 6 per row */
+    }
+
     
     /* Force all images to a uniform shape */
     .gallery-grid img {
