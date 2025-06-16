@@ -270,6 +270,32 @@
       max-width: 350px;
       display: block;
     }
+
+    .rate-card {
+  cursor: pointer; /* indicate clickable card */
+  position: relative;
+}
+
+    .book-hint {
+      margin-top: 1rem;
+      font-weight: 600;
+      color: #264db5;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.3rem;
+      user-select: none;
+    }
+    
+    .book-hint i {
+      transition: transform 0.3s ease;
+    }
+    
+    .rate-card:hover .book-hint i {
+      transform: translateX(5px);
+    }
+
   </style>
 </head>
 <body>
@@ -319,6 +345,9 @@
             A complimentary initial visit to meet your pets and go over care
             instructions, routines, and home logistics.
           </p>
+          <p class="book-hint">
+          Click to Book <i class="fas fa-arrow-right"></i>
+        </p>
         </div>
       </a>
 
@@ -340,6 +369,9 @@
             <strong>+$10</strong> per additional dog •
             <strong>+$5</strong> per additional cat or bird family
           </p>
+          <p class="book-hint">
+          Click to Book <i class="fas fa-arrow-right"></i>
+        </p>
         </div>
       </a>
 
@@ -367,6 +399,9 @@
             <br />
             <strong>+$20</strong> per additional pet
           </p>
+          <p class="book-hint">
+          Click to Book <i class="fas fa-arrow-right"></i>
+        </p>
         </div>
       </a>
     </div>
