@@ -296,22 +296,31 @@
       transform: translateX(5px);
     }
 
-      @media (max-width: 480px) {
-    /* Increase bottom padding on rates section to avoid cropping */
-    .rates {
-      padding-bottom: 4rem; /* more space below */
-    }
-  
-    /* Add some margin bottom on last card */
-    .rate-card:last-child {
-      margin-bottom: 1rem;
-    }
-  
-    /* Ensure top margin is big enough to clear fixed bar */
-    .header-image {
-      margin-top: 80px; /* increase top margin for mobile if needed */
-    }
+@media (max-width: 480px) {
+  /* Stack the cards vertically on small screens */
+  .rate-grid {
+    flex-direction: column;
+    align-items: center;
   }
+
+  /* Make each card link full width with some margin */
+  .rate-grid a.card-link {
+    flex: none;
+    max-width: 90vw;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Add bottom padding to rates section so content isn't cropped */
+  .rates {
+    padding-bottom: 4rem;
+  }
+
+  /* Increase top margin of header image to clear fixed nav bar */
+  .header-image {
+    margin-top: 80px;
+  }
+}
 
 
   </style>
