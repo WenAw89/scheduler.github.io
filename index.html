@@ -4,8 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cat Dog Goose - Pet Care</title>
-  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
   <style>
     * {
       box-sizing: border-box;
@@ -18,7 +23,6 @@
       background: #fefefe;
       color: #333;
       line-height: 1.6;
-      padding-top: 70px; /* to prevent content under fixed top bar */
     }
 
     .top-bar {
@@ -34,8 +38,7 @@
       align-items: center;
       z-index: 1000;
       backdrop-filter: blur(6px);
-      flex-wrap: nowrap;
-      gap: 1rem;
+      flex-wrap: wrap;
     }
 
     .contact-info {
@@ -44,7 +47,8 @@
       display: flex;
       gap: 1.2rem;
       align-items: center;
-      flex-wrap: wrap;
+      flex: 1 1 auto;
+      min-width: 220px;
     }
 
     .contact-info a {
@@ -53,13 +57,14 @@
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      white-space: nowrap;
     }
 
     .nav-buttons {
       display: flex;
-      gap: 0.75rem;
-      flex-wrap: nowrap;
+      gap: 0.6rem;
+      flex: 1 1 auto;
+      justify-content: flex-end;
+      min-width: 180px;
     }
 
     .nav-buttons a {
@@ -71,8 +76,7 @@
       border-radius: 6px;
       transition: background 0.3s;
       white-space: nowrap;
-      flex-shrink: 0;
-      font-size: 1rem;
+      font-size: 0.9rem;
     }
 
     .nav-buttons a:hover {
@@ -80,19 +84,23 @@
     }
 
     .header-image {
+      margin-top: 70px;
+      max-width: 1000px;
       width: 100%;
-      max-width: 1000px;  /* bigger max width on desktop */
       height: auto;
+      min-height: 200px;
       display: block;
-      margin: 0 auto 1rem;
-    }
-    
-    @media (max-width: 768px) {
-      .header-image {
-        max-width: 95vw; /* smaller on mobile */
-      }
+      margin-left: auto;
+      margin-right: auto;
+      object-fit: contain;
     }
 
+    /* Minimum height on small screens so it’s not too short */
+    @media (max-width: 480px) {
+      .header-image {
+        min-height: 280px;
+      }
+    }
 
     .hero {
       background: #fff4ef;
@@ -206,8 +214,14 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     footer {
@@ -218,52 +232,31 @@
       font-size: 0.9rem;
     }
 
-    /* Responsive adjustments */
+    /* Responsive tweaks */
     @media (max-width: 768px) {
-      body {
-        padding-top: 130px; /* taller top bar on small screens */
-      }
-
       .top-bar {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.6rem;
-        padding: 1rem 1rem 0.8rem;
       }
-
-      .contact-info {
-        font-size: 0.9rem;
-        gap: 1rem;
-        flex-wrap: wrap;
-        width: 100%;
-      }
-
       .nav-buttons {
+        margin-top: 0.5rem;
+        justify-content: flex-start;
         width: 100%;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 0.5rem;
       }
-
       .nav-buttons a {
-        flex: 1 1 30%;
+        margin-left: 0;
+        margin-right: 0.5rem;
         font-size: 1rem;
-        padding: 0.5rem 0;
-        text-align: center;
-        white-space: normal;
-        min-width: 100px;
-        border-radius: 5px;
+        padding: 0.5rem 0.8rem;
       }
-
-      .header-image {
-        width: 95vw;
-        max-width: none;
-        margin-bottom: 1rem;
-        margin-top: 0;
+      .contact-info {
+        justify-content: flex-start;
+        width: 100%;
+        margin-bottom: 0.3rem;
       }
     }
 
-    /* Card link styles */
+    /* Card link styling */
     .card-link {
       text-decoration: none;
       color: inherit;
@@ -283,7 +276,6 @@
   </style>
 </head>
 <body>
-
   <!-- Fixed top bar -->
   <div class="top-bar">
     <div class="contact-info">
@@ -291,64 +283,98 @@
       <a href="mailto:catdoggoose01@gmail.com"><i class="fas fa-envelope"></i> catdoggoose01@gmail.com</a>
     </div>
     <div class="nav-buttons">
-      <a href="/meet&greet">Meet & Greet</a>
-      <a href="/dropin">Drop‑In Visits</a>
-      <a href="/housesit">House Sitting</a>
+      <a href="meetgreet.html">Meet & Greet</a>
+      <a href="dropin.html">Drop‑In Visits</a>
+      <a href="housesit.html">House Sitting</a>
     </div>
   </div>
 
   <!-- Header image -->
-  <img src="webcatdoggoosev4.png" alt="Cat Dog Goose Banner" class="header-image" />
+  <img
+    src="webcatdoggoosev4.png"
+    alt="Cat Dog Goose Banner"
+    class="header-image"
+  />
 
   <!-- Hero Section -->
   <div class="hero">
     <h2>Give Your Pets the Care They Deserve</h2>
-    <p>Personalized pet sitting for your cats, dogs, and the occasional goose and chickens in Mebane, Hillsborough, and surrounding areas.</p>
+    <p>
+      Personalized pet sitting for your cats, dogs, and the occasional goose and
+      chickens in Mebane, Hillsborough, and surrounding areas.
+    </p>
   </div>
 
   <!-- Rates Section -->
   <section class="rates" id="rates">
     <h2>Rates & Services</h2>
     <div class="rate-grid">
-
-      <a href="/meet&greet" class="card-link">
-        <div class="rate-card" style="background-color: #f0f8ff; border-left-color: #5a9bd8;">
+      <!-- Meet & Greet Card -->
+      <a href="meetgreet.html" class="card-link">
+        <div
+          class="rate-card"
+          style="background-color: #f0f8ff; border-left-color: #5a9bd8"
+        >
           <h3><i class="fas fa-handshake"></i> Meet & Greet</h3>
           <p class="rate-price">Free</p>
-          <p class="rate-desc">A complimentary initial visit to meet your pets and go over care instructions, routines, and home logistics.</p>
+          <p class="rate-desc">
+            A complimentary initial visit to meet your pets and go over care
+            instructions, routines, and home logistics.
+          </p>
         </div>
       </a>
 
-      <a href="/dropin" class="card-link">
-        <div class="rate-card" style="background-color: #fff7f0; border-left-color: #f28c38;">
+      <!-- Drop-In Visits Card -->
+      <a href="dropin.html" class="card-link">
+        <div
+          class="rate-card"
+          style="background-color: #fff7f0; border-left-color: #f28c38"
+        >
           <h3><i class="fas fa-paw"></i> Drop-In Visits</h3>
           <p class="rate-price">$25 • 30 min</p>
           <p class="rate-price">$50 • 60 min</p>
-          <p class="rate-desc">Each visit includes potty breaks, playtime or a walk, feeding, and plenty of love and attention.
-            You'll receive photos and a visit recap to stay connected while you're away!</p>
-          <strong>+$10</strong> per additional dog • <strong>+$5</strong> per additional cat or bird family
+          <p class="rate-desc">
+            Each visit includes potty breaks, playtime or a walk, feeding, and
+            plenty of love and attention. You'll receive photos and a visit recap
+            to stay connected while you're away!
+          </p>
+          <p>
+            <strong>+$10</strong> per additional dog •
+            <strong>+$5</strong> per additional cat or bird family
+          </p>
         </div>
       </a>
 
-      <a href="/housesit" class="card-link">
-        <div class="rate-card" style="background-color: #f5f5fc; border-left-color: #7b6cd9;">
+      <!-- House Sitting Card -->
+      <a href="housesit.html" class="card-link">
+        <div
+          class="rate-card"
+          style="background-color: #f5f5fc; border-left-color: #7b6cd9"
+        >
           <h3><i class="fas fa-home"></i> House Sitting & Overnight Care</h3>
           <p class="rate-price">$65 • Standard Overnight</p>
           <p class="rate-price">$140 • Extended & Puppy Care</p>
-          Both options provide in-home overnight care to keep your pets comfortable and your home secure.<br>
-          Each visit includes mail/package pickup, plant watering, and home checks.<br>
-          <strong>Standard:</strong> Evening to morning care with feeding, attention, playtime, walk, and routine checks.<br>
-          <strong>Extended:</strong> Ideal for puppies or senior pets needing extra care, more potty breaks, and closer supervision.<br>
-          <strong>+$20</strong> per additional pet
+          <p>
+            Both options provide in-home overnight care to keep your pets
+            comfortable and your home secure.
+            <br />
+            Each visit includes mail/package pickup, plant watering, and home
+            checks.
+            <br />
+            <strong>Standard:</strong> Evening to morning care with feeding,
+            attention, playtime, walk, and routine checks.
+            <br />
+            <strong>Extended:</strong> Ideal for puppies or senior pets needing
+            extra care, more potty breaks, and closer supervision.
+            <br />
+            <strong>+$20</strong> per additional pet
+          </p>
         </div>
       </a>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer>
-    &copy; 2025 Cat Dog Goose • Mebane, NC • All rights reserved.
-  </footer>
-
+  <footer>&copy; 2025 Cat Dog Goose • Mebane, NC • All rights reserved.</footer>
 </body>
 </html>
