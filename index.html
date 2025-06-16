@@ -144,15 +144,18 @@ body {
 }
 
 .rate-grid {
-  display: grid;
-  flex-wrap: wrap;
-  gap: 2rem;
+  display: flex;
+  flex-wrap: nowrap;
   justify-content: center;
+  gap: 2rem;
   max-width: 1100px;
   margin: 0 auto;
 }
 
 .rate-card {
+  flex: 1 1 0;
+  max-width: 33.333%;
+  min-width: 280px; /* optional: prevents too narrow cards on medium screens */
   background: #fff;
   border-radius: 12px;
   padding: 2rem;
@@ -266,16 +269,16 @@ footer {
     width: 100%;
     margin-bottom: 0.3rem;
   }
-    .rate-grid {
+  .rate-grid {
     flex-wrap: wrap;
   }
+
   .rate-card {
     max-width: 100%;
     flex: 1 1 100%;
     margin-bottom: 1.5rem;
-
   }
-}  
+}
     
 @media (max-width: 480px) {
   /* Stack the cards vertically on small screens */
