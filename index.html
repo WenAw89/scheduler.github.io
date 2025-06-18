@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CatDogGoose Sitter Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 1rem;
+      max-width: 900px;
+      margin: auto;
+    }
+    input, button {
+      padding: 5px;
+      margin: 5px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🐾 CatDogGoose Sitter Dashboard</h2>
+
+  <div id="login-section">
+    <p>Please enter your email to access the dashboard:</p>
+    <input type="email" id="sitter-email" placeholder="you@example.com" />
+    <button onclick="login()">Login</button>
+    <p id="login-error" style="color:red;"></p>
+  </div>
+
+  <div id="dashboard" style="display:none;">
+    <h3>Pending Bookings</h3>
+    <table id="booking-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Pets</th>
+          <th>Address</th>
+          <th>Summary</th>
+          <th>Price ($)</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const webAppUrl = "YOUR_WEB_APP_URL_HERE";
+    let sitterEmail = '';
+
+    function login() {
+      sitterEmail = document.getElementById("sitter-email").value;
+      if (!sitterEmail) {
+        document.getElementById("login-error").innerText = "Please enter a valid email.";
+        return;
+      }
+      fetchBookings();
+    }
+
+    function fetchBookings() {
+      fetch(webAppUrl, {
+        method: "POST",
+        body: JSON.stringify({ action: "getBookings", email: sitterEmail }),
+        contentType: "application/json"
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          document.getElementById("login-error").innerText = data.error;
+        } else {
+          document.getElementById("login-section").style.display = "none";
+          document.getElementById("dashboard").style.display = "block";
+          populateTable(data.data);
+        }
+      });
+    }
+
+    function populateTable(bookings) {
+      const tbody = document.querySelector("#booking-table tbody");
+      tbody.innerHTML = "";
+      bookings.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.Name}</td>
+          <td>${row.Pets}</td>
+          <td>${row.Address}</td>
+          <td><pre>${row.Summary || ''}</pre></td>
+          <td>
+            <input type="number" value="${row.Price || ''}" onchange="updatePrice(${row.rowNumber}, this.value)" />
+          </td>
+          <td>
+            <button onclick="sendInvite(${row.rowNumber})">📅 Invite</button>
+            <button onclick="sendInvoice(${row.rowNumber})">📧 Invoice</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updatePrice(rowNumber, price) {
+      fetch(webAppUrl, {
+        method: "POST",
+        body: JSON.stringify({ action: "updatePrice", email: sitterEmail, rowNumber, price }),
+        contentType: "application/json"
+      }).then(res => res.json()).then(data => {
+        if (data.success) alert("Price updated.");
+        else alert(data.error || "Failed to update price.");
+      });
+    }
+
+    function sendInvite(rowNumber) {
+      fetch(webAppUrl, {
+        method: "POST",
+        body: JSON.stringify({ action: "sendInvite", email: sitterEmail, rowNumber }),
+        contentType: "application/json"
+      }).then(res => res.json()).then(data => {
+        if (data.success) alert("Invite sent!");
+        else alert(data.error || "Invite failed.");
+      });
+    }
+
+    function sendInvoice(rowNumber) {
+      fetch(webAppUrl, {
+        method: "POST",
+        body: JSON.stringify({ action: "sendInvoice", email: sitterEmail, rowNumber }),
+        contentType: "application/json"
+      }).then(res => res.json()).then(data => {
+        if (data.success) alert("Invoice sent!");
+        else alert(data.error || "Invoice failed.");
+      });
+    }
+  </script>
+
+</body>
+</html>
